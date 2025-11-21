@@ -1,5 +1,6 @@
 #include <iostream>
 #include <opencv2/opencv.hpp>
+#include <filesystem>   
 
 // ITK
 #include "itkImage.h"
@@ -8,6 +9,9 @@
 #include "itkCastImageFilter.h"
 #include "itkImageRegionConstIterator.h"
 
+#include "itkGDCMImageIO.h"
+
+namespace fs = std::filesystem;
 
 cv::Mat ITKImageToCVMat(itk::Image<unsigned char, 2>::Pointer image)
 {
@@ -34,16 +38,36 @@ cv::Mat ITKImageToCVMat(itk::Image<unsigned char, 2>::Pointer image)
 
 int main(int argc, char *argv[])
 {
-    if (argc < 2)
+    std::string imagesFolder = "images";
+
+    if (!fs::exists(imagesFolder))
     {
-        std::cerr << "Uso: " << argv[0] << " <L19.IMA>" << std::endl;
+        std::cerr << "La carpeta 'images/' no existe. Créala junto al ejecutable." << std::endl;
         return EXIT_FAILURE;
     }
 
-    std::string filename = argv[1];
+    // Buscar el primer archivo .IMA
+    std::string filename;
+
+    for (const auto& entry : fs::directory_iterator(imagesFolder))
+    {
+        if (entry.path().extension() == ".IMA")
+        {
+            filename = entry.path().string();
+            break;
+        }
+    }
+
+    if (filename.empty())
+    {
+        std::cerr << " No se encontró ninguna imagen .IMA en /images." << std::endl;
+        return EXIT_FAILURE;
+    }
+
+    std::cout << " Cargando archivo: " << filename << std::endl;
 
     // ITK types
-    using PixelType = signed short; // HU values
+    using PixelType = signed short; 
     constexpr unsigned int Dimension = 2;
 
     using ImageType = itk::Image<PixelType, Dimension>;
@@ -52,17 +76,21 @@ int main(int argc, char *argv[])
     ReaderType::Pointer reader = ReaderType::New();
     reader->SetFileName(filename);
 
+    // --- ACTIVAR LECTOR GDCM (NECESARIO PARA IMÁGENES .IMA) ---
+    itk::GDCMImageIO::Pointer gdcmIO = itk::GDCMImageIO::New();
+    reader->SetImageIO(gdcmIO);
+
     try
     {
         reader->Update();
     }
     catch (itk::ExceptionObject &ex)
     {
-        std::cerr << "Error al leer DICOM: " << ex << std::endl;
+        std::cerr << "Error al leer imagen IMA con GDCM: " << ex << std::endl;
         return EXIT_FAILURE;
     }
 
-    // Rescale intensities to 0–255 (necessary for OpenCV)
+    // Rescale intensities to 0–255
     using UCharImageType = itk::Image<unsigned char, 2>;
     using RescaleFilterType = itk::RescaleIntensityImageFilter<ImageType, UCharImageType>;
 
@@ -72,15 +100,17 @@ int main(int argc, char *argv[])
     rescaler->SetInput(reader->GetOutput());
     rescaler->Update();
 
-    // Convert ITK image → OpenCV Mat
+    // Convertir ITK → OpenCV
     cv::Mat img = ITKImageToCVMat(rescaler->GetOutput());
 
-    // Show image
-    cv::imshow("DICOM Slice", img);
+    // Mostrar
+    cv::imshow("Imagen IMA", img);
     cv::waitKey(0);
 
-    // Save image for testing
-    cv::imwrite("slice_output.png", img);
+    // Guardar salida
+    cv::imwrite("output_slice.png", img);
+
+    std::cout << "Imagen convertida y guardada como output_slice.png" << std::endl;
 
     return EXIT_SUCCESS;
 }
