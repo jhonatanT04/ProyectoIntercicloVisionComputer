@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>MainWindow</class>
+ <widget class="QMainWindow" name="MainWindow">
+  <property name="geometry"><rect><x>0</x><y>0</y><width>1600</width><height>800</height></rect></property>
+  <property name="windowTitle"><string>Procesador CT Moderno</string></property>
+
+  <widget class="QWidget" name="centralwidget">
+   <layout class="QHBoxLayout" name="horizontalLayout">
+
+    <!-- Panel izquierdo: botones y lista -->
+    <item>
+     <widget class="QWidget" name="leftPanel">
+      <property name="styleSheet"><string>background-color: #2E3440;</string></property>
+      <layout class="QVBoxLayout" name="leftLayout">
+       <item>
+        <widget class="QPushButton" name="pushButton">
+         <property name="text"><string>Cargar Imagen</string></property>
+         <property name="styleSheet"><string>color:white; background-color:#5E81AC; font-weight:bold; height:40px;</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="listWidget">
+         <property name="styleSheet"><string>color:black; background-color:#D8DEE9;</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_2">
+         <property name="text"><string>Filtros Aplicados</string></property>
+         <property name="styleSheet"><string>color:white; background-color:#A3BE8C; font-weight:bold; height:40px;</string></property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QPushButton" name="pushButton_3">
+         <property name="text"><string>Aplicar Red Neuronal</string></property>
+         <property name="styleSheet"><string>color:white; background-color:#BF616A; font-weight:bold; height:40px;</string></property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </item>
+
+    <!-- Panel derecho: imágenes y sliders -->
+    <item>
+     <widget class="QWidget" name="rightPanel">
+      <layout class="QVBoxLayout" name="rightLayout">
+
+       <!-- Imágenes principales -->
+       <item>
+        <layout class="QHBoxLayout" name="imagesLayout">
+         <item>
+          <widget class="QLabel" name="label">
+           <property name="text"><string>Pipeline Final</string></property>
+           <property name="alignment"><set>Qt::AlignCenter</set></property>
+           <property name="frameShape"><enum>QFrame::Box</enum></property>
+           <property name="minimumSize"><size><width>250</width><height>250</height></size></property>
+           <property name="styleSheet"><string>background-color:#ECEFF4; font-weight:bold;</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_3">
+           <property name="text"><string>Resaltada</string></property>
+           <property name="alignment"><set>Qt::AlignCenter</set></property>
+           <property name="frameShape"><enum>QFrame::Box</enum></property>
+           <property name="minimumSize"><size><width>250</width><height>250</height></size></property>
+           <property name="styleSheet"><string>background-color:#ECEFF4; font-weight:bold;</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="label_2">
+           <property name="text"><string>Segmentada</string></property>
+           <property name="alignment"><set>Qt::AlignCenter</set></property>
+           <property name="frameShape"><enum>QFrame::Box</enum></property>
+           <property name="minimumSize"><size><width>250</width><height>250</height></size></property>
+           <property name="styleSheet"><string>background-color:#ECEFF4; font-weight:bold;</string></property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+
+       <!-- Sliders para filtros útiles -->
+       <item>
+        <layout class="QVBoxLayout" name="slidersLayout">
+         <item>
+          <widget class="QLabel" name="labelSlider1">
+           <property name="text"><string>Gaussian Blur</string></property>
+           <property name="styleSheet"><string>font-weight:bold; color:#4C566A;</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="horizontalSlider"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelSlider2">
+           <property name="text"><string>Median Blur</string></property>
+           <property name="styleSheet"><string>font-weight:bold; color:#4C566A;</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="horizontalSlider_2"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget>
+         </item>
+         <item>
+          <widget class="QLabel" name="labelSlider3">
+           <property name="text"><string>CLAHE / Contraste</string></property>
+           <property name="styleSheet"><string>font-weight:bold; color:#4C566A;</string></property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QSlider" name="horizontalSlider_3"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget>
+         </item>
+        </layout>
+       </item>
+
+      </layout>
+     </widget>
+    </item>
+
+   </layout>
+  </widget>
+
+  <widget class="QMenuBar" name="menubar"/>
+  <widget class="QStatusBar" name="statusbar"/>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

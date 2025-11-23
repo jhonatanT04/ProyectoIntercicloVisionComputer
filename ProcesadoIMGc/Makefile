@@ -31,7 +31,8 @@ LIBS = \
     -lopencv_imgcodecs \
     -lopencv_highgui \
     -lopencv_video \
-    -lopencv_videoio
+    -lopencv_videoio \
+    -lopencv_photo 
 
 # Archivos fuente
 SRC = main.cpp
