@@ -2,113 +2,724 @@
 <ui version="4.0">
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry"><rect><x>0</x><y>0</y><width>1600</width><height>800</height></rect></property>
-  <property name="windowTitle"><string>Procesador CT Moderno</string></property>
+  <property name="geometry">
+   <rect>
+    <x>0</x>
+    <y>0</y>
+    <width>1920</width>
+    <height>1080</height>
+   </rect>
+  </property>
+  <property name="windowTitle">
+   <string>CT Image Processor Pro</string>
+  </property>
+  <property name="styleSheet">
+   <string notr="true">
+    QMainWindow {
+        background: qlineargradient(x1:0, y1:0, x2:1, y2:1,
+                                   stop:0 #0f0f1e, stop:1 #1a1a2e);
+    }
+   </string>
+  </property>
 
   <widget class="QWidget" name="centralwidget">
-   <layout class="QHBoxLayout" name="horizontalLayout">
+   <property name="styleSheet">
+    <string notr="true">
+     QWidget#centralwidget {
+         background: transparent;
+     }
+    </string>
+   </property>
+   
+   <layout class="QHBoxLayout" name="mainLayout" stretch="0,1">
+    <property name="spacing">
+     <number>0</number>
+    </property>
+    <property name="leftMargin">
+     <number>0</number>
+    </property>
+    <property name="topMargin">
+     <number>0</number>
+    </property>
+    <property name="rightMargin">
+     <number>0</number>
+    </property>
+    <property name="bottomMargin">
+     <number>0</number>
+    </property>
 
-    <!-- Panel izquierdo: botones y lista -->
+    <!-- ==================== PANEL IZQUIERDO (SIDEBAR) ==================== -->
     <item>
      <widget class="QWidget" name="leftPanel">
-      <property name="styleSheet"><string>background-color: #2E3440;</string></property>
+      <property name="minimumSize">
+       <size>
+        <width>320</width>
+        <height>0</height>
+       </size>
+      </property>
+      <property name="maximumSize">
+       <size>
+        <width>320</width>
+        <height>16777215</height>
+       </size>
+      </property>
+      <property name="styleSheet">
+       <string notr="true">
+        QWidget#leftPanel {
+            background-color: rgba(22, 22, 34, 0.95);
+            border-right: 2px solid rgba(100, 149, 237, 0.3);
+        }
+        
+        QPushButton {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #667eea, stop:1 #764ba2);
+            color: white;
+            border: none;
+            border-radius: 12px;
+            padding: 16px;
+            font-size: 14px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            text-align: left;
+            padding-left: 24px;
+        }
+        
+        QPushButton:hover {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #764ba2, stop:1 #667eea);
+            transform: translateY(-2px);
+        }
+        
+        QPushButton:pressed {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #5a4a8a, stop:1 #556cd6);
+        }
+        
+        QPushButton#pushButton {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #56CCF2, stop:1 #2F80ED);
+        }
+        
+        QPushButton#pushButton:hover {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #2F80ED, stop:1 #56CCF2);
+        }
+        
+        QPushButton#pushButton_2 {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #11998e, stop:1 #38ef7d);
+        }
+        
+        QPushButton#pushButton_2:hover {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #38ef7d, stop:1 #11998e);
+        }
+        
+        QPushButton#pushButton_3 {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #f093fb, stop:1 #f5576c);
+        }
+        
+        QPushButton#pushButton_3:hover {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #f5576c, stop:1 #f093fb);
+        }
+        
+        QListWidget {
+            background-color: rgba(30, 30, 46, 0.8);
+            border: 1px solid rgba(100, 149, 237, 0.2);
+            border-radius: 12px;
+            padding: 8px;
+            color: #e0e0e0;
+            font-size: 13px;
+        }
+        
+        QListWidget::item {
+            padding: 12px;
+            border-radius: 8px;
+            margin: 4px 0px;
+        }
+        
+        QListWidget::item:hover {
+            background-color: rgba(100, 149, 237, 0.15);
+        }
+        
+        QListWidget::item:selected {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 rgba(102, 126, 234, 0.3),
+                                       stop:1 rgba(118, 75, 162, 0.3));
+            border-left: 3px solid #667eea;
+        }
+       </string>
+      </property>
+      
       <layout class="QVBoxLayout" name="leftLayout">
+       <property name="spacing">
+        <number>12</number>
+       </property>
+       <property name="leftMargin">
+        <number>20</number>
+       </property>
+       <property name="topMargin">
+        <number>24</number>
+       </property>
+       <property name="rightMargin">
+        <number>20</number>
+       </property>
+       <property name="bottomMargin">
+        <number>24</number>
+       </property>
+
+       <!-- Logo / Título -->
+       <item>
+        <widget class="QLabel" name="titleLabel">
+         <property name="text">
+          <string>CT PROCESSOR</string>
+         </property>
+         <property name="alignment">
+          <set>Qt::AlignCenter</set>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">
+           QLabel {
+               color: white;
+               font-size: 20px;
+               font-weight: 700;
+               letter-spacing: 2px;
+               padding: 16px;
+               background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                          stop:0 rgba(102, 126, 234, 0.2),
+                                          stop:1 rgba(118, 75, 162, 0.2));
+               border-radius: 12px;
+               border: 1px solid rgba(100, 149, 237, 0.3);
+           }
+          </string>
+         </property>
+        </widget>
+       </item>
+
+       <item>
+        <spacer name="verticalSpacer_1">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeType">
+          <enum>QSizePolicy::Fixed</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+
+       <!-- Botón Cargar Imagen -->
        <item>
         <widget class="QPushButton" name="pushButton">
-         <property name="text"><string>Cargar Imagen</string></property>
-         <property name="styleSheet"><string>color:white; background-color:#5E81AC; font-weight:bold; height:40px;</string></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>56</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>📁  Cargar Imagen CT</string>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
         </widget>
        </item>
+
+       <!-- Lista de imágenes -->
+       <item>
+        <widget class="QLabel" name="labelListTitle">
+         <property name="text">
+          <string>Imágenes Procesadas</string>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">
+           QLabel {
+               color: rgba(255, 255, 255, 0.7);
+               font-size: 12px;
+               font-weight: 600;
+               letter-spacing: 1px;
+               text-transform: uppercase;
+               padding: 8px 4px;
+           }
+          </string>
+         </property>
+        </widget>
+       </item>
+
        <item>
         <widget class="QListWidget" name="listWidget">
-         <property name="styleSheet"><string>color:black; background-color:#D8DEE9;</string></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>200</height>
+          </size>
+         </property>
         </widget>
        </item>
+
+       <item>
+        <spacer name="verticalSpacer_2">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>40</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+
+       <!-- Botón Pipeline -->
        <item>
         <widget class="QPushButton" name="pushButton_2">
-         <property name="text"><string>Filtros Aplicados</string></property>
-         <property name="styleSheet"><string>color:white; background-color:#A3BE8C; font-weight:bold; height:40px;</string></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>56</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>🔬  Ver Pipeline Completo</string>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
         </widget>
        </item>
+
+       <!-- Botón Red Neuronal -->
        <item>
         <widget class="QPushButton" name="pushButton_3">
-         <property name="text"><string>Aplicar Red Neuronal</string></property>
-         <property name="styleSheet"><string>color:white; background-color:#BF616A; font-weight:bold; height:40px;</string></property>
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>56</height>
+          </size>
+         </property>
+         <property name="text">
+          <string>🧠  Aplicar Red Neuronal</string>
+         </property>
+         <property name="cursor">
+          <cursorShape>PointingHandCursor</cursorShape>
+         </property>
         </widget>
        </item>
+
+       <item>
+        <spacer name="verticalSpacer_3">
+         <property name="orientation">
+          <enum>Qt::Vertical</enum>
+         </property>
+         <property name="sizeHint" stdset="0">
+          <size>
+           <width>20</width>
+           <height>20</height>
+          </size>
+         </property>
+        </spacer>
+       </item>
+
       </layout>
      </widget>
     </item>
 
-    <!-- Panel derecho: imágenes y sliders -->
+    <!-- ==================== PANEL DERECHO (CONTENIDO PRINCIPAL) ==================== -->
     <item>
      <widget class="QWidget" name="rightPanel">
+      <property name="styleSheet">
+       <string notr="true">
+        QWidget#rightPanel {
+            background: transparent;
+        }
+        
+        QLabel[frameShape="4"] {
+            background: rgba(30, 30, 46, 0.6);
+            border: 2px solid rgba(100, 149, 237, 0.2);
+            border-radius: 16px;
+            padding: 12px;
+            color: white;
+            font-size: 13px;
+            font-weight: 600;
+            backdrop-filter: blur(10px);
+        }
+        
+        QLabel[frameShape="4"]:hover {
+            border-color: rgba(100, 149, 237, 0.5);
+            background: rgba(30, 30, 46, 0.8);
+        }
+       </string>
+      </property>
+      
       <layout class="QVBoxLayout" name="rightLayout">
+       <property name="spacing">
+        <number>20</number>
+       </property>
+       <property name="leftMargin">
+        <number>24</number>
+       </property>
+       <property name="topMargin">
+        <number>24</number>
+       </property>
+       <property name="rightMargin">
+        <number>24</number>
+       </property>
+       <property name="bottomMargin">
+        <number>24</number>
+       </property>
 
-       <!-- Imágenes principales -->
+       <!-- Grid de Imágenes -->
        <item>
-        <layout class="QHBoxLayout" name="imagesLayout">
-         <item>
+        <layout class="QGridLayout" name="imagesGrid">
+         <property name="horizontalSpacing">
+          <number>16</number>
+         </property>
+         <property name="verticalSpacing">
+          <number>16</number>
+         </property>
+
+         <!-- Fila 1 -->
+         <item row="0" column="0">
           <widget class="QLabel" name="label">
-           <property name="text"><string>Pipeline Final</string></property>
-           <property name="alignment"><set>Qt::AlignCenter</set></property>
-           <property name="frameShape"><enum>QFrame::Box</enum></property>
-           <property name="minimumSize"><size><width>250</width><height>250</height></size></property>
-           <property name="styleSheet"><string>background-color:#ECEFF4; font-weight:bold;</string></property>
+           <property name="text">
+            <string>🎨 Pipeline Final</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>300</height>
+            </size>
+           </property>
+           <property name="scaledContents">
+            <bool>false</bool>
+           </property>
           </widget>
          </item>
-         <item>
+
+         <item row="0" column="1">
           <widget class="QLabel" name="label_3">
-           <property name="text"><string>Resaltada</string></property>
-           <property name="alignment"><set>Qt::AlignCenter</set></property>
-           <property name="frameShape"><enum>QFrame::Box</enum></property>
-           <property name="minimumSize"><size><width>250</width><height>250</height></size></property>
-           <property name="styleSheet"><string>background-color:#ECEFF4; font-weight:bold;</string></property>
+           <property name="text">
+            <string>✨ Región Resaltada</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>300</height>
+            </size>
+           </property>
           </widget>
          </item>
-         <item>
+
+         <item row="0" column="2">
           <widget class="QLabel" name="label_2">
-           <property name="text"><string>Segmentada</string></property>
-           <property name="alignment"><set>Qt::AlignCenter</set></property>
-           <property name="frameShape"><enum>QFrame::Box</enum></property>
-           <property name="minimumSize"><size><width>250</width><height>250</height></size></property>
-           <property name="styleSheet"><string>background-color:#ECEFF4; font-weight:bold;</string></property>
+           <property name="text">
+            <string>🔍 Segmentación</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>300</height>
+            </size>
+           </property>
           </widget>
          </item>
+
+         <!-- Fila 2: Imágenes adicionales -->
+         <item row="1" column="0">
+          <widget class="QLabel" name="label_4">
+           <property name="text">
+            <string>🌈 Overlay Multicolor</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>300</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+
+         <item row="1" column="1">
+          <widget class="QLabel" name="label_5">
+           <property name="text">
+            <string>🦴 Extracción Ósea</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>300</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+
+         <item row="1" column="2">
+          <widget class="QLabel" name="label_6">
+           <property name="text">
+            <string>🔥 Heatmap</string>
+           </property>
+           <property name="alignment">
+            <set>Qt::AlignCenter</set>
+           </property>
+           <property name="frameShape">
+            <enum>QFrame::Box</enum>
+           </property>
+           <property name="minimumSize">
+            <size>
+             <width>300</width>
+             <height>300</height>
+            </size>
+           </property>
+          </widget>
+         </item>
+
         </layout>
        </item>
 
-       <!-- Sliders para filtros útiles -->
+       <!-- Panel de Controles (Sliders) -->
        <item>
-        <layout class="QVBoxLayout" name="slidersLayout">
-         <item>
-          <widget class="QLabel" name="labelSlider1">
-           <property name="text"><string>Gaussian Blur</string></property>
-           <property name="styleSheet"><string>font-weight:bold; color:#4C566A;</string></property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSlider" name="horizontalSlider"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="labelSlider2">
-           <property name="text"><string>Median Blur</string></property>
-           <property name="styleSheet"><string>font-weight:bold; color:#4C566A;</string></property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSlider" name="horizontalSlider_2"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget>
-         </item>
-         <item>
-          <widget class="QLabel" name="labelSlider3">
-           <property name="text"><string>CLAHE / Contraste</string></property>
-           <property name="styleSheet"><string>font-weight:bold; color:#4C566A;</string></property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QSlider" name="horizontalSlider_3"><property name="orientation"><enum>Qt::Horizontal</enum></property></widget>
-         </item>
-        </layout>
+        <widget class="QWidget" name="controlsPanel">
+         <property name="minimumSize">
+          <size>
+           <width>0</width>
+           <height>180</height>
+          </size>
+         </property>
+         <property name="styleSheet">
+          <string notr="true">
+           QWidget#controlsPanel {
+               background: rgba(30, 30, 46, 0.7);
+               border: 2px solid rgba(100, 149, 237, 0.2);
+               border-radius: 16px;
+               padding: 20px;
+           }
+           
+           QLabel {
+               color: rgba(255, 255, 255, 0.9);
+               font-size: 13px;
+               font-weight: 600;
+               letter-spacing: 0.5px;
+           }
+           
+           QSlider::groove:horizontal {
+               height: 8px;
+               background: rgba(50, 50, 70, 0.8);
+               border-radius: 4px;
+           }
+           
+           QSlider::handle:horizontal {
+               background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                          stop:0 #667eea, stop:1 #764ba2);
+               border: 2px solid rgba(255, 255, 255, 0.3);
+               width: 18px;
+               height: 18px;
+               margin: -5px 0;
+               border-radius: 9px;
+           }
+           
+           QSlider::handle:horizontal:hover {
+               background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                          stop:0 #764ba2, stop:1 #667eea);
+               border-color: rgba(255, 255, 255, 0.6);
+           }
+           
+           QSlider::sub-page:horizontal {
+               background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                          stop:0 #667eea, stop:1 #764ba2);
+               border-radius: 4px;
+           }
+          </string>
+         </property>
+         
+         <layout class="QGridLayout" name="slidersGrid">
+          <property name="horizontalSpacing">
+           <number>24</number>
+          </property>
+          <property name="verticalSpacing">
+           <number>12</number>
+          </property>
+
+          <!-- Slider 1: Gaussian -->
+          <item row="0" column="0">
+           <widget class="QLabel" name="labelSlider1">
+            <property name="text">
+             <string>🌀 Gaussian Blur</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="0">
+           <widget class="QSlider" name="horizontalSlider">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>15</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+           </widget>
+          </item>
+
+          <!-- Slider 2: Median -->
+          <item row="0" column="1">
+           <widget class="QLabel" name="labelSlider2">
+            <property name="text">
+             <string>📊 Median Filter</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="1">
+           <widget class="QSlider" name="horizontalSlider_2">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>15</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+           </widget>
+          </item>
+
+          <!-- Slider 3: CLAHE -->
+          <item row="0" column="2">
+           <widget class="QLabel" name="labelSlider3">
+            <property name="text">
+             <string>💎 CLAHE Contrast</string>
+            </property>
+           </widget>
+          </item>
+          <item row="1" column="2">
+           <widget class="QSlider" name="horizontalSlider_3">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="minimum">
+             <number>10</number>
+            </property>
+            <property name="maximum">
+             <number>50</number>
+            </property>
+            <property name="value">
+             <number>30</number>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+           </widget>
+          </item>
+
+          <!-- Slider 4: Threshold -->
+          <item row="2" column="0">
+           <widget class="QLabel" name="labelSlider4">
+            <property name="text">
+             <string>🎯 Threshold Level</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="0">
+           <widget class="QSlider" name="horizontalSlider_4">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="minimum">
+             <number>0</number>
+            </property>
+            <property name="maximum">
+             <number>255</number>
+            </property>
+            <property name="value">
+             <number>128</number>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+           </widget>
+          </item>
+
+          <!-- Slider 5: Morph -->
+          <item row="2" column="1">
+           <widget class="QLabel" name="labelSlider5">
+            <property name="text">
+             <string>🔷 Morph Kernel</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="1">
+           <widget class="QSlider" name="horizontalSlider_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>15</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+           </widget>
+          </item>
+
+         </layout>
+        </widget>
        </item>
 
       </layout>
@@ -118,9 +729,55 @@
    </layout>
   </widget>
 
-  <widget class="QMenuBar" name="menubar"/>
-  <widget class="QStatusBar" name="statusbar"/>
+  <!-- MenuBar con estilo -->
+  <widget class="QMenuBar" name="menubar">
+   <property name="geometry">
+    <rect>
+     <x>0</x>
+     <y>0</y>
+     <width>1920</width>
+     <height>24</height>
+    </rect>
+   </property>
+   <property name="styleSheet">
+    <string notr="true">
+     QMenuBar {
+         background-color: rgba(22, 22, 34, 0.95);
+         color: white;
+         border-bottom: 1px solid rgba(100, 149, 237, 0.3);
+         padding: 4px;
+     }
+     
+     QMenuBar::item {
+         padding: 6px 12px;
+         background: transparent;
+         border-radius: 4px;
+     }
+     
+     QMenuBar::item:selected {
+         background: rgba(102, 126, 234, 0.3);
+     }
+    </string>
+   </property>
+  </widget>
+
+  <!-- StatusBar con estilo -->
+  <widget class="QStatusBar" name="statusbar">
+   <property name="styleSheet">
+    <string notr="true">
+     QStatusBar {
+         background: rgba(22, 22, 34, 0.95);
+         color: rgba(255, 255, 255, 0.7);
+         border-top: 1px solid rgba(100, 149, 237, 0.3);
+         padding: 4px 12px;
+         font-size: 11px;
+     }
+    </string>
+   </property>
+  </widget>
+
  </widget>
+ 
  <resources/>
  <connections/>
 </ui>
