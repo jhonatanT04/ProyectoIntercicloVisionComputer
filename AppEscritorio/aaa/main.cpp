@@ -17,6 +17,7 @@ int a_h = 10;
 int b_h = 255;
 int a_p = 10;
 int b_p = 255;
+int tamanio_p = 3;
 int a_m = 10;
 int b_m = 255;
 // void updateInfo() {
@@ -60,6 +61,7 @@ int main(int argc, char* argv[]) {
     createTrackbar("parametro 1 ", "Hueso", &a_h, 255);
     createTrackbar("parametro 2 ", "Hueso", &b_h, 255);
 
+    createTrackbar("tamaño ", "Pulmones", &tamanio_p, 20);
     createTrackbar("parametro 1 ", "Pulmones", &a_p, 255);
     createTrackbar("parametro 2 ", "Pulmones", &b_p, 255);
 
@@ -69,11 +71,12 @@ int main(int argc, char* argv[]) {
     // setTrackbarPos("Segundo parametro ", "Hueso", 255);
 
     setTrackbarPos("parametro 1 ", "Hueso", 20);
-    setTrackbarPos("parametro 2 ", "Hueso", 20);
+    setTrackbarPos("parametro 2 ", "Hueso", 255);
 
     
     setTrackbarPos("parametro 1 ", "Pulmones", 2);
-    setTrackbarPos("parametro 2 ", "Pulmones", 2);
+    setTrackbarPos("parametro 2 ", "Pulmones", 255);
+    setTrackbarPos("tamaño ", "Pulmones", 3);
 
     setTrackbarPos("parametro 1 ", "Musculos", 55);
     setTrackbarPos("parametro 2 ", "Musculos", 103);
@@ -81,10 +84,13 @@ int main(int argc, char* argv[]) {
     while (true) {
         // Convertir valor del trackbar a HU real
         // int a_real = a_trackbar + MIN_HU;
-        
+        tamanio_p = (tamanio_p % 2 == 0) ? tamanio_p + 1 : tamanio_p;
         imshow("Imagen", processor->getOriginalImage());
         imshow("Hueso", processor->deteccionHuesos(a_h,b_h));
-        imshow("Pulmones", processor->deteccionPulmones(a_p,b_p));
+
+
+        imshow("Pulmones", processor->deteccionPulmones(a_p,b_p,tamanio_p));
+        // imshow("Musculos", processor->contrastStretching(a_m,b_m)); //100-150
         imshow("Musculos", processor->deteccionMuscular(a_m,b_m));
         // updateInfo();
         imshow("Equalizada", processor->imgEcualizada());

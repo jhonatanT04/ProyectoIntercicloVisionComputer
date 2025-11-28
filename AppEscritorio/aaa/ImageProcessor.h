@@ -16,9 +16,10 @@ public:
 
     bool loadImage(const std::string& filePath);
     Mat deteccionHuesos(int a, int b);
-    Mat deteccionPulmones(int a, int b);
+    Mat deteccionPulmones(int a, int b, int tamanio);
     Mat deteccionMuscular(int a, int b);
     Mat imgEcualizada();
+    Mat contrastStretching(int a, int b);
     // Opcionalmente puedes agregar getters
     const Mat& getOriginalImage() const { return m_originalImage; }
     const Mat& getRawImage() const { return m_rawImage; }

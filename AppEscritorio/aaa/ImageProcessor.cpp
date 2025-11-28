@@ -130,6 +130,24 @@ Mat equializadaHistograma(const Mat& img) {
     return img_clahe;
 }
 
+
+Mat stretchingParaTomografia(const cv::Mat& img, int min_intensidad = 50, int max_intensidad = 250) {
+    cv::Mat resultado;
+    
+    // Aplicar stretching en un rango específico
+    double alpha = 255.0 / (max_intensidad - min_intensidad);
+    double beta = -min_intensidad * alpha;
+    
+    img.convertTo(resultado, CV_8U, alpha, beta);
+    
+    // Clip valores
+    cv::Mat clipped;
+    cv::max(resultado, 0, clipped);
+    cv::min(clipped, 255, resultado);
+    
+    return resultado;
+}
+
 Mat ImageProcessor::deteccionHuesos(int a, int b) {
     // A es el valor del umbral (ej. 200)
     // B es el valor máximo (normalmente 255)
@@ -152,10 +170,10 @@ Mat ImageProcessor::deteccionHuesos(int a, int b) {
     Mat maskHuesos;
     // CORRECCIÓN 1: Usar THRESH_BINARY.
     // Necesitamos bordes definidos (0 o 255) para que findContours funcione bien.
-    threshold(imgBlur, maskHuesos, (double)a, (double)b, THRESH_TOZERO);
+    threshold(imgBlur, maskHuesos, (double)a, (double)b, THRESH_BINARY);
 
     // 4. Encontrar Contornos
-    // CORRECCIÓN 2: Usar 'vector<vector<Point>>', NO 'Point2d'.
+    // CORRECCIÓN 2: Usar 'vector<vector<Point>>'
     vector<vector<cv::Point>> contours;
     vector<Vec4i> hierarchy;
     
@@ -178,7 +196,7 @@ Mat ImageProcessor::deteccionHuesos(int a, int b) {
     return maskSoloHuesos;
 }
 
-Mat ImageProcessor::deteccionPulmones(int a, int b) {
+Mat ImageProcessor::deteccionPulmones(int a, int b,int tamanio) {
     
     
     Mat img = m_originalImage.clone();
@@ -204,7 +222,7 @@ Mat ImageProcessor::deteccionPulmones(int a, int b) {
 
     // 4. Operaciones Morfológicas (Mejora de la máscara)
     // Creamos un elemento estructurante de 3x3 (rectángulo)
-    Mat kernel = getStructuringElement(MORPH_RECT, cv::Size(3, 3));
+    Mat kernel = getStructuringElement(MORPH_RECT, cv::Size(tamanio, tamanio));
     
     // Aplicamos "Closing" para rellenar huecos internos (vasos sanguíneos)
     // Iterations = 2 para asegurar un buen relleno
@@ -269,7 +287,16 @@ Mat ImageProcessor::imgEcualizada() {
     return img_clahe;
 }
 
+Mat ImageProcessor::contrastStretching(int a, int b) {
+    Mat img = m_originalImage.clone();
+    if (img.empty()) {
+        cout << "Error: No se pudo cargar la imagen." << endl;
+        return Mat();
+    }
 
+    Mat img_stretched = stretchingParaTomografia(img, a, b);
+    return img_stretched;
+}
 
 
 // Mat ImageProcessor::deteccionHuesos(int a, int b) {

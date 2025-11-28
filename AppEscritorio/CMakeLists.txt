@@ -28,6 +28,7 @@ set(SOURCES
     pipelinedialog.cpp  
     pipelinedialog.h
     ProcesadoIMGc/CTProcessorSimple.cpp
+    aaa/ImageProcessor.cpp
 )
 
 add_executable(AppEscritorio ${SOURCES})

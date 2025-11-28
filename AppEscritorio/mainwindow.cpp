@@ -8,9 +8,9 @@ MainWindow::MainWindow(QWidget *parent)
 {
     ui->setupUi(this);
     processor = new CTImageProcessor("output");  
-
+    procesado = new ImageProcessor();
     // Configurar rangos de sliders
-    ui->horizontalSlider->setRange(1, 15);      // Gaussian kernel (impar)
+    ui->horizontalSlider->setRange(1, 255);      // Gaussian kernel (impar)
     ui->horizontalSlider->setValue(5);
     ui->horizontalSlider_2->setRange(1, 15);    // Median kernel (impar)
     ui->horizontalSlider_2->setValue(5);
@@ -34,6 +34,7 @@ MainWindow::~MainWindow()
 {
     delete processor;
     delete ui;
+    delete procesado;
 }
 
 // ==================== Conversión Mat -> QImage ====================
@@ -72,9 +73,11 @@ void MainWindow::on_pushButton_clicked()
         QMessageBox::warning(this, "Error", "No se pudo cargar la imagen.");
         return;
     }
-
-    currentImage = processor->getOriginalImage();  
-
+    procesado->loadImage(fileName.toStdString());
+    Mat img = procesado->getOriginalImage();
+    // currentImage = processor->getOriginalImage();  
+    currentImage = img.clone();  
+    
     // Mostrar imagen original como icono en panel izquierdo
     QImage qorig = matToQImage(currentImage);
     ui->listWidget->clear();
@@ -262,7 +265,8 @@ void MainWindow::updateFilters()
     // ============================================================
     // OBTENER VALORES DE SLIDERS
     // ============================================================
-    int gaussianK = std::max(1, ui->horizontalSlider->value() | 1);  // Forzar impar
+    // int gaussianK = std::max(1, ui->horizontalSlider->value() | 1);  // Forzar impar
+    int gaussianK = 3;  // Forzar impar
     int medianK   = std::max(1, ui->horizontalSlider_2->value() | 1); // Forzar impar
     double claheClip = ui->horizontalSlider_3->value() / 10.0;
     
@@ -318,6 +322,11 @@ void MainWindow::updateFilters()
     cv::cvtColor(edges, edgeColor, cv::COLOR_GRAY2BGR);
     edgeColor.setTo(cv::Scalar(0, 255, 255), edges);  // Bordes amarillos
     cv::addWeighted(finalVis, 0.8, edgeColor, 0.2, 0, finalVis);
+
+
+    Mat imgHuesos = procesado->deteccionHuesos(ui->horizontalSlider->value(),255);
+    Mat imgPulmones = procesado->deteccionPulmones(ui->horizontalSlider->value(),255,3);
+    Mat imgMusculos = procesado->deteccionMuscular(ui->horizontalSlider->value(),255);
 
     // ============================================================
     // MOSTRAR RESULTADOS
