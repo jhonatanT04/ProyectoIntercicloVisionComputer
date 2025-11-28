@@ -225,7 +225,7 @@
           </size>
          </property>
          <property name="text">
-          <string>📁  Cargar Imagen CT</string>
+          <string>Cargar Imagen CT</string>
          </property>
          <property name="cursor">
           <cursorShape>PointingHandCursor</cursorShape>
@@ -289,7 +289,7 @@
           </size>
          </property>
          <property name="text">
-          <string>🔬  Ver Pipeline Completo</string>
+          <string>Ver Pipeline Completo</string>
          </property>
          <property name="cursor">
           <cursorShape>PointingHandCursor</cursorShape>
@@ -307,7 +307,7 @@
           </size>
          </property>
          <property name="text">
-          <string>🧠  Aplicar Red Neuronal</string>
+          <string>Aplicar Red Neuronal</string>
          </property>
          <property name="cursor">
           <cursorShape>PointingHandCursor</cursorShape>
@@ -391,7 +391,7 @@
          <item row="0" column="0">
           <widget class="QLabel" name="label">
            <property name="text">
-            <string>🎨 Pipeline Final</string>
+            <string>Pipeline Final</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -434,7 +434,7 @@
          <item row="0" column="2">
           <widget class="QLabel" name="label_2">
            <property name="text">
-            <string>🔍 Segmentación</string>
+            <string>Segmentación</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -452,10 +452,10 @@
          </item>
 
          <!-- Fila 2: Imágenes adicionales -->
-         <item row="1" column="0">
+         <!-- <item row="1" column="0">
           <widget class="QLabel" name="label_4">
            <property name="text">
-            <string>🌈 Overlay Multicolor</string>
+            <string>Overlay Multicolor</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -475,7 +475,7 @@
          <item row="1" column="1">
           <widget class="QLabel" name="label_5">
            <property name="text">
-            <string>🦴 Extracción Ósea</string>
+            <string>Extracción Ósea</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -490,12 +490,12 @@
             </size>
            </property>
           </widget>
-         </item>
+         </item> -->
 
-         <item row="1" column="2">
+         <!-- <item row="1" column="2">
           <widget class="QLabel" name="label_6">
            <property name="text">
-            <string>🔥 Heatmap</string>
+            <string>Heatmap</string>
            </property>
            <property name="alignment">
             <set>Qt::AlignCenter</set>
@@ -510,7 +510,7 @@
             </size>
            </property>
           </widget>
-         </item>
+         </item> -->
 
         </layout>
        </item>
@@ -582,7 +582,7 @@
           <item row="0" column="0">
            <widget class="QLabel" name="labelSlider1">
             <property name="text">
-             <string>🌀 Gaussian Blur</string>
+             <string>Gaussian Blur</string>
             </property>
            </widget>
           </item>
@@ -610,7 +610,7 @@
           <item row="0" column="1">
            <widget class="QLabel" name="labelSlider2">
             <property name="text">
-             <string>📊 Median Filter</string>
+             <string>Median Filter</string>
             </property>
            </widget>
           </item>
@@ -638,7 +638,7 @@
           <item row="0" column="2">
            <widget class="QLabel" name="labelSlider3">
             <property name="text">
-             <string>💎 CLAHE Contrast</string>
+             <string>CLAHE Contrast</string>
             </property>
            </widget>
           </item>
@@ -666,7 +666,7 @@
           <item row="2" column="0">
            <widget class="QLabel" name="labelSlider4">
             <property name="text">
-             <string>🎯 Threshold Level</string>
+             <string>Threshold Level</string>
             </property>
            </widget>
           </item>
@@ -694,12 +694,40 @@
           <item row="2" column="1">
            <widget class="QLabel" name="labelSlider5">
             <property name="text">
-             <string>🔷 Morph Kernel</string>
+             <string>Morph Kernel</string>
             </property>
            </widget>
           </item>
           <item row="3" column="1">
            <widget class="QSlider" name="horizontalSlider_5">
+            <property name="orientation">
+             <enum>Qt::Horizontal</enum>
+            </property>
+            <property name="minimum">
+             <number>1</number>
+            </property>
+            <property name="maximum">
+             <number>15</number>
+            </property>
+            <property name="value">
+             <number>5</number>
+            </property>
+            <property name="cursor">
+             <cursorShape>PointingHandCursor</cursorShape>
+            </property>
+           </widget>
+          </item>
+          
+            <!-- Slider 6: -->
+          <item row="2" column="2">
+           <widget class="QLabel" name="labelSlider6">
+            <property name="text">
+             <string>Slider</string>
+            </property>
+           </widget>
+          </item>
+          <item row="3" column="2">
+           <widget class="QSlider" name="horizontalSlider_6">
             <property name="orientation">
              <enum>Qt::Horizontal</enum>
             </property>

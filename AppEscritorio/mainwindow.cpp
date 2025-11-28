@@ -10,16 +10,24 @@ MainWindow::MainWindow(QWidget *parent)
     processor = new CTImageProcessor("output");  
     procesado = new ImageProcessor();
     // Configurar rangos de sliders
-    ui->horizontalSlider->setRange(1, 255);      // Gaussian kernel (impar)
+    ui->horizontalSlider->setRange(3, 20);      // Gaussian kernel (impar)
     ui->horizontalSlider->setValue(5);
+
     ui->horizontalSlider_2->setRange(1, 15);    // Median kernel (impar)
     ui->horizontalSlider_2->setValue(5);
+
     ui->horizontalSlider_3->setRange(10, 50);   // CLAHE clip limit (*0.1)
     ui->horizontalSlider_3->setValue(30);
+
+    ui->horizontalSlider_4->setRange(0,255 );    // Bilateral filter d
+    ui->horizontalSlider_4->setValue(125);
+
+    ui->horizontalSlider_5->setRange(1, 255);    // Morph
+    ui->horizontalSlider_5->setValue(5);
+
+    ui->horizontalSlider_6->setRange(1, 21);    // Morph
+    ui->horizontalSlider_6->setValue(8);
     
-    // NUEVOS SLIDERS (agrega estos en Qt Designer)
-    // ui->horizontalSlider_4 para threshold (0-255)
-    // ui->horizontalSlider_5 para morph kernel size (1-15)
 
     // Conectar sliders para tiempo real
     connect(ui->horizontalSlider, &QSlider::valueChanged,
@@ -27,6 +35,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->horizontalSlider_2, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
     connect(ui->horizontalSlider_3, &QSlider::valueChanged,
+            this, &MainWindow::updateFilters);
+    connect(ui->horizontalSlider_4, &QSlider::valueChanged,
+            this, &MainWindow::updateFilters);
+    connect(ui->horizontalSlider_5, &QSlider::valueChanged,
+            this, &MainWindow::updateFilters);
+    connect(ui->horizontalSlider_6, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
 }
 
@@ -63,9 +77,11 @@ QImage MainWindow::matToQImage(const cv::Mat &mat)
 // ==================== BOTÓN 1: Cargar Imagen ====================
 void MainWindow::on_pushButton_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(
-        this, "Seleccionar imagen CT", "",
-        "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
+    // QString fileName = QFileDialog::getOpenFileName(
+    //     this, "Seleccionar imagen CT", "",
+    //     "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
+
+    QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
 
     if(fileName.isEmpty()) return;
 
@@ -73,6 +89,7 @@ void MainWindow::on_pushButton_clicked()
         QMessageBox::warning(this, "Error", "No se pudo cargar la imagen.");
         return;
     }
+    // procesado->loadImage(fileName.toStdString());
     procesado->loadImage(fileName.toStdString());
     Mat img = procesado->getOriginalImage();
     // currentImage = processor->getOriginalImage();  
@@ -99,19 +116,20 @@ void MainWindow::applyInternalPipeline()
 {
     if (currentImage.empty()) return;
 
-    cv::Mat img = currentImage.clone();
-    cv::Mat processed;
+    Mat img = currentImage.clone();
+    Mat processed;
 
     // ============================================================
     // ETAPA 1: WINDOW/LEVEL PARA CT (¡CRÍTICO!)
     // ============================================================
     // Aplicar ventana de tejido blando si es imagen CT raw
-    processed = processor->applyWindowLevel(40, 400);
+    // processed = processor->applyWindowLevel(40, 400);
+    processed = procesado->getOriginalImage();
     
     // ============================================================
     // ETAPA 2: MEJORA DE CONTRASTE (Stack completo)
     // ============================================================
-    processed = processor->normalize(processed);
+    processed = procesado->normalizeImage(processed);
     processed = processor->applyCLAHE(processed, 3.0);
     processed = processor->histogramEqualization(processed);
     
@@ -265,8 +283,8 @@ void MainWindow::updateFilters()
     // ============================================================
     // OBTENER VALORES DE SLIDERS
     // ============================================================
-    // int gaussianK = std::max(1, ui->horizontalSlider->value() | 1);  // Forzar impar
-    int gaussianK = 3;  // Forzar impar
+    int gaussianK = std::max(1, ui->horizontalSlider->value() | 1);  // Forzar impar
+    // int gaussianK = 3;  // Forzar impar
     int medianK   = std::max(1, ui->horizontalSlider_2->value() | 1); // Forzar impar
     double claheClip = ui->horizontalSlider_3->value() / 10.0;
     
@@ -275,8 +293,8 @@ void MainWindow::updateFilters()
     // int morphSize = std::max(1, ui->horizontalSlider_5->value() | 1);  // Forzar impar
     
     // Valores por defecto si no tienes los sliders
-    int threshValue = 128;
-    int morphSize = 5;
+    int threshValue = ui->horizontalSlider_4->value();
+    int morphSize = std::max(1, ui->horizontalSlider_5->value() | 1);  // Forzar impar
 
     cv::Mat filtered = currentImage.clone();
 
