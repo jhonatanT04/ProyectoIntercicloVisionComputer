@@ -594,6 +594,11 @@ Mat ImageProcessor::highlightRegion(String name,Mat mask,  Mat background, Scala
     
     return output;
 }
+
+
+
+
+
 // Mat ImageProcessor::deteccionHuesos(int a, int b) {
 //     Mat img = m_originalImage;
 

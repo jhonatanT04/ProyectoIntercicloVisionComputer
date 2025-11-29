@@ -80,7 +80,7 @@ public:
     Mat combineWithEdges( Mat input,  Mat edges, 
                              Scalar edgeColor = Scalar(0, 255, 0));
 
-
+    
     
 
 

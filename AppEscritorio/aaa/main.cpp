@@ -37,7 +37,7 @@ int a_clahe = 2;
 
 int main(int argc, char* argv[]) {
 
-    string imagePath = "./L19.IMA";
+    string imagePath = "./L14.IMA";
 
     if (argc >= 2) {
         imagePath = argv[1];
@@ -59,12 +59,13 @@ int main(int argc, char* argv[]) {
     
     namedWindow("overlay",WINDOW_AUTOSIZE);
     namedWindow("overlay2",WINDOW_AUTOSIZE);
+    
     // Trackbar de 0 a 2400 (representa -1200 a 1200 HU)
     // createTrackbar("Umbral HU", "Hueso", &a_trackbar, TRACKBAR_RANGE);
     // createTrackbar("Segundo parametro ", "Hueso", &b, 255);
     createTrackbar("parametro 1 ", "Img parametrizada", &a_h, 255);
-    createTrackbar("parametro 2 ", "Img parametrizada", &b_h, 255);
-    createTrackbar("k ", "Img parametrizada", &k_n, 10);
+    createTrackbar("parametro 2 ", "Img parametrizada", &b_h, 30);
+    createTrackbar("k ", "Img parametrizada", &k_n, 30);
 
     // createTrackbar("tamaño ", "Pulmones", &tamanio_p, 20);
     // createTrackbar("parametro 1 ", "Pulmones", &a_p, 255);
@@ -93,7 +94,7 @@ int main(int argc, char* argv[]) {
         // Convertir valor del trackbar a HU real
         // int a_real = a_trackbar + MIN_HU;
         // tamanio_p = (tamanio_p % 2 == 0) ? tamanio_p + 1 : tamanio_p;
-        // k_n = std::max(1, k_n | 1);
+        k_n = std::max(1, k_n | 1);
 
         b_h = std::max(1, b_h | 1);
         
@@ -111,19 +112,58 @@ int main(int argc, char* argv[]) {
         // imshow("Musculos", processor->contrastStretching(a_m,b_m)); //100-150
         // imshow("Musculos", processor->deteccionMuscular(a_m,b_m));
         // updateInfo();
+        
         Mat imgMejoramiento = processor->segmentByIntensity(imgCLAHE, a_h, 255);
         imshow("Img parametrizada", imgMejoramiento);
-        Mat imgMejSuavizada = processor->filterBilateral(imgMejoramiento, k_n);
-        imshow("Imagen Suavizada", imgMejSuavizada);
+        
+        Mat imgMejSuavizada = processor->filterNLMeans(imgMejoramiento);
+        
+        Mat suavizada2 = processor->filterMedian(imgMejSuavizada,b_h);
+        suavizada2 =  processor->morphDilation(suavizada2,k_n);
+        
+        imshow("Imagen Suavizada",imgCLAHE );
 
-        imshow("overlay", processor->createColorOverlay(img, imgMejSuavizada, Scalar(0,0,255),0.5));
+        imshow("overlay", processor->createColorOverlay(img, imgMejoramiento, Scalar(0,0,255),0.8));
 
-        imshow("overlay2", processor->highlightRegion("Hueso",imgMejSuavizada, img,Scalar(0,255,255)));
+        imshow("overlay2", processor->highlightRegion("Hueso",suavizada2, img,Scalar(255,0,255)));
+        
         if (waitKey(23) == 27) break;
     }
-
     cout << endl;
     destroyAllWindows();
     delete processor;
     return 0;
 }
+
+//================ Codigo deteccion Huesos ================
+
+///namedWindow("Imagen Suavizada", WINDOW_AUTOSIZE);
+//namedWindow("Img parametrizada", WINDOW_AUTOSIZE);
+    
+//namedWindow("overlay",WINDOW_AUTOSIZE);
+//namedWindow("overlay2",WINDOW_AUTOSIZE);
+//createTrackbar("parametro 1 ", "Img parametrizada", &a_h, 255);
+//createTrackbar("parametro 2 ", "Img parametrizada", &b_h, 30);
+//createTrackbar("k", "Img parametrizada", &k_n, 30);
+
+
+//setTrackbarPos("parametro 1 ", "Img parametrizada", 180);
+//setTrackbarPos("parametro 2 ", "Img parametrizada", 10);
+//setTrackbarPos("k", "Img parametrizada", 3);
+// k_n = std::max(1, k_n | 1);
+// b_h = std::max(1, b_h | 1);
+        
+// Mat img = processor->getOriginalImage();
+// Mat imgCLAHE = processor->applyCLAHE(img, 3);
+
+// Mat imgMejoramiento = processor->segmentByIntensity(imgCLAHE, a_h, 255);
+// imshow("Img parametrizada", imgMejoramiento);
+// 
+// Mat imgMejSuavizada = processor->filterNLMeans(imgMejoramiento);
+// 
+// Mat suavizada2 = processor->filterMedian(imgMejSuavizada,b_h);
+// suavizada2 =  processor->morphDilation(suavizada2,k_n);
+// 
+// imshow("Imagen Suavizada",suavizada2 );
+// imshow("overlay", processor->createColorOverlay(img, imgMejoramiento, Scalar(0,0,255),0.8));
+// imshow("overlay2", processor->highlightRegion("Hueso",suavizada2, img,Scalar(255,0,255)));

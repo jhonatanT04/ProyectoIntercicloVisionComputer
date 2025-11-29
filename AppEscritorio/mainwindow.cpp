@@ -10,22 +10,22 @@ MainWindow::MainWindow(QWidget *parent)
     processor = new CTImageProcessor("output");  
     procesado = new ImageProcessor();
     // Configurar rangos de sliders
-    ui->horizontalSlider->setRange(3, 20);      // Gaussian kernel (impar)
-    ui->horizontalSlider->setValue(5);
+    ui->horizontalSlider->setRange(100, 255);      
+    ui->horizontalSlider->setValue(170);  //Parametro 1 Huesos 1-255 (inRange)
 
-    ui->horizontalSlider_2->setRange(1, 15);    // Median kernel (impar)
-    ui->horizontalSlider_2->setValue(5);
+    ui->horizontalSlider_2->setRange(0, 30);    
+    ui->horizontalSlider_2->setValue(0);  //Parametro 2 Huesos 0-30 (kernel Reduccion Ruido-Mediana)
 
-    ui->horizontalSlider_3->setRange(10, 50);   // CLAHE clip limit (*0.1)
-    ui->horizontalSlider_3->setValue(30);
+    ui->horizontalSlider_3->setRange(0, 30);   
+    ui->horizontalSlider_3->setValue(0); //Parametro 3 Huesos 0-30 (Kernel Suavizado-hightRegion)
 
-    ui->horizontalSlider_4->setRange(0,255 );    // Bilateral filter d
+    ui->horizontalSlider_4->setRange(0,255 );   
     ui->horizontalSlider_4->setValue(125);
 
-    ui->horizontalSlider_5->setRange(1, 255);    // Morph
+    ui->horizontalSlider_5->setRange(1, 255);   
     ui->horizontalSlider_5->setValue(5);
 
-    ui->horizontalSlider_6->setRange(1, 21);    // Morph
+    ui->horizontalSlider_6->setRange(1, 21);    
     ui->horizontalSlider_6->setValue(8);
     
 
@@ -288,6 +288,13 @@ void MainWindow::updateFilters()
     int medianK   = std::max(1, ui->horizontalSlider_2->value() | 1); // Forzar impar
     double claheClip = ui->horizontalSlider_3->value() / 10.0;
     
+    //================ Codigo deteccion Huesos ================
+    int a_h = ui->horizontalSlider->value();      // 1-255
+    int b_h = std::max(1, ui->horizontalSlider_2->value() | 1);  // Forzar impar
+    int k_n = std::max(1, ui->horizontalSlider_3->value() | 1);  // Forzar impar
+
+
+
     // Sliders adicionales (si los agregaste en Qt Designer)
     // int threshValue = ui->horizontalSlider_4->value();  // 0-255
     // int morphSize = std::max(1, ui->horizontalSlider_5->value() | 1);  // Forzar impar
@@ -301,7 +308,47 @@ void MainWindow::updateFilters()
     // ============================================================
     // PROCESAMIENTO LIGERO Y RÁPIDO
     // ============================================================
-    
+    Mat img = procesado->getOriginalImage();
+    Mat imgCLAHE = processor->applyCLAHE(img, 3);
+    Mat imgMejoramiento = processor->segmentByIntensity(imgCLAHE, a_h, 255);
+
+    Mat imgMejSuavizada = processor->filterNLMeans(imgMejoramiento);
+    Mat suavizada2 = processor->filterMedian(imgMejSuavizada,b_h);
+    suavizada2 =  processor->morphDilation(suavizada2,k_n);
+
+    //================ Codigo deteccion Huesos ================
+
+    //namedWindow("Imagen Suavizada", WINDOW_AUTOSIZE);
+    //namedWindow("Img parametrizada", WINDOW_AUTOSIZE);
+
+    //namedWindow("overlay",WINDOW_AUTOSIZE);
+    //namedWindow("overlay2",WINDOW_AUTOSIZE);
+    //createTrackbar("parametro 1 ", "Img parametrizada", &a_h, 255);
+    //createTrackbar("parametro 2 ", "Img parametrizada", &b_h, 30);
+    //createTrackbar("k", "Img parametrizada", &k_n, 30);
+
+
+    //setTrackbarPos("parametro 1 ", "Img parametrizada", 180);
+    //setTrackbarPos("parametro 2 ", "Img parametrizada", 10);
+    //setTrackbarPos("k", "Img parametrizada", 3);
+    // k_n = std::max(1, k_n | 1);
+    // b_h = std::max(1, b_h | 1);
+
+    // Mat img = processor->getOriginalImage();
+    // Mat imgCLAHE = processor->applyCLAHE(img, 3);
+
+    // Mat imgMejoramiento = processor->segmentByIntensity(imgCLAHE, a_h, 255);
+    // imshow("Img parametrizada", imgMejoramiento);
+    // 
+    // Mat imgMejSuavizada = processor->filterNLMeans(imgMejoramiento);
+    // 
+    // Mat suavizada2 = processor->filterMedian(imgMejSuavizada,b_h);
+    // suavizada2 =  processor->morphDilation(suavizada2,k_n);
+    // 
+    // imshow("Imagen Suavizada",suavizada2 );
+    // imshow("overlay", processor->createColorOverlay(img, imgMejoramiento, Scalar(0,0,255),0.8));
+    // imshow("overlay2", processor->highlightRegion("Hueso",suavizada2, img,Scalar(255,0,255)));
+
     // 1. MEJORA DE CONTRASTE (ligera)
     filtered = processor->normalize(filtered);
     filtered = processor->applyCLAHE(filtered, claheClip);
@@ -349,15 +396,15 @@ void MainWindow::updateFilters()
     // ============================================================
     // MOSTRAR RESULTADOS
     // ============================================================
-    ui->label->setPixmap(QPixmap::fromImage(matToQImage(overlay)
+    ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->filterMedian(img,3))
                         .scaled(ui->label->width(), ui->label->height(), 
                                Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
-    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(thresholded)
+    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(img, imgMejoramiento, Scalar(0,0,255),0.8))
                           .scaled(ui->label_2->width(), ui->label_2->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
-    ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(finalVis)
+    ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(procesado->highlightRegion("Hueso",suavizada2, img,Scalar(255,0,255)))
                           .scaled(ui->label_3->width(), ui->label_3->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 }
