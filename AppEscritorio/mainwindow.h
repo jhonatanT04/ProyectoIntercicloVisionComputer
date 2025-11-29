@@ -7,6 +7,12 @@
 #include <QFileDialog>
 #include <QMessageBox>
 #include <QSlider>
+#include <QProcess>           // ← FALTABA: Para ejecutar Python
+#include <QProgressDialog>    // ← FALTABA: Para barra de progreso
+#include <QFile>              // ← FALTABA: Para eliminar temp_input.png
+#include <QDir>               // ← FALTABA: Para crear carpeta output
+#include <QDebug>             // ← FALTABA: Para qDebug()
+#include <QListWidgetItem>    // ← FALTABA: Si usas listWidget
 #include <opencv2/opencv.hpp>
 #include "ProcesadoIMGc/CTProcessorSimple.h"
 #include "aaa/ImageProcessor.h"
@@ -25,21 +31,20 @@ public:
 
 private slots:
     void on_pushButton_clicked();       // Cargar Imagen
-    void on_pushButton_2_clicked();     // Pipeline interno (botón opcional)
-    void on_pushButton_3_clicked();     // Aplicar Red
+    void on_pushButton_2_clicked();     // Pipeline completo
+    void on_pushButton_3_clicked();     // Aplicar Red Neuronal DnCNN
 
     void updateFilters();               // Actualizar sliders en tiempo real
 
 private:
     Ui::MainWindow *ui;
     CTImageProcessor *processor;        // Procesador de imágenes
-    ImageProcessor *procesado;           // Procesador de imágenes
+    ImageProcessor *procesado;          // Procesador de imágenes
     cv::Mat currentImage;               // Imagen original
     cv::Mat pipelineImage;              // Imagen con pipeline interno
 
     QImage matToQImage(const cv::Mat &mat);
-
     void applyInternalPipeline();       // Aplica filtros internos automáticamente
 };
 
-#endif // MAINWINDOW_H
+#endif // MAINWINDOW_Hy
