@@ -534,6 +534,7 @@ void MainWindow::on_pushButton_2_clicked()
 }
 
 // ==================== BOTÓN 3: Red Neuronal (Denoising DNN) ====================
+// ==================== BOTÓN 3: Red Neuronal DnCNN (Python) ====================
 void MainWindow::on_pushButton_3_clicked()
 {
     if(currentImage.empty()) {
@@ -541,11 +542,93 @@ void MainWindow::on_pushButton_3_clicked()
         return;
     }
 
-    // Aplicar denoising con DNN
-    cv::Mat denoised = processor->applyDenoisingDNN(currentImage);
-
-    // Comparación lado a lado
-    cv::Mat comparison;
+    // 1. Guardar la imagen actual temporalmente
+    QString tempImagePath = "temp_input.png";
+    bool saved = cv::imwrite(tempImagePath.toStdString(), currentImage);
+    
+    if(!saved) {
+        QMessageBox::critical(this, "Error", "No se pudo guardar la imagen temporal.");
+        return;
+    }
+    
+    // 2. Crear directorio de salida si no existe
+    QDir outputDir("output");
+    if(!outputDir.exists()) {
+        outputDir.mkpath(".");
+    }
+    
+    // 3. Preparar el proceso Python
+    QProcess process;
+    QString pythonScript = "main.py";
+    QString outputPath = "output/resultado_denoising.png";
+    
+    // 4. Mostrar diálogo de progreso
+    QProgressDialog progress("Aplicando DnCNN (modelo pre-entrenado)...", 
+                            "Cancelar", 0, 0, this);
+    progress.setWindowModality(Qt::WindowModal);
+    progress.setMinimumDuration(0);
+    progress.setValue(0);
+    progress.show();
+    QApplication::processEvents();
+    
+    // 5. Ejecutar el script Python con la imagen temporal
+    QStringList arguments;
+    arguments << pythonScript << tempImagePath;
+    
+    qDebug() << "Ejecutando:" << "python3" << arguments;
+    
+    process.start("python3", arguments);
+    
+    // Esperar a que termine (máximo 60 segundos para CT grandes)
+    bool finished = process.waitForFinished(60000);
+    
+    progress.close();
+    
+    if(!finished) {
+        QMessageBox::critical(this, "Error", 
+            "El proceso de Python tomó demasiado tiempo o falló.\n" + 
+            process.errorString());
+        QFile::remove(tempImagePath);
+        return;
+    }
+    
+    // 6. Verificar código de salida
+    int exitCode = process.exitCode();
+    QString stdOutput = process.readAllStandardOutput();
+    QString stdError = process.readAllStandardError();
+    
+    qDebug() << "Exit code:" << exitCode;
+    qDebug() << "Output:" << stdOutput;
+    qDebug() << "Errors:" << stdError;
+    
+    if(exitCode != 0) {
+        QMessageBox::critical(this, "Error de Python", 
+            "El script Python falló con código " + QString::number(exitCode) + ":\n\n" + 
+            stdError + "\n\n" + stdOutput);
+        QFile::remove(tempImagePath);
+        return;
+    }
+    
+    // 7. Verificar que se creó el archivo de salida
+    if(!QFile::exists(outputPath)) {
+        QMessageBox::critical(this, "Error", 
+            "El script Python se ejecutó pero no generó el archivo esperado:\n" + 
+            outputPath + "\n\nOutput:\n" + stdOutput);
+        QFile::remove(tempImagePath);
+        return;
+    }
+    
+    // 8. Leer la imagen procesada
+    cv::Mat denoised = cv::imread(outputPath.toStdString(), cv::IMREAD_UNCHANGED);
+    
+    if(denoised.empty()) {
+        QMessageBox::critical(this, "Error", 
+            "No se pudo cargar la imagen procesada desde:\n" + outputPath);
+        QFile::remove(tempImagePath);
+        return;
+    }
+    
+    // 9. Asegurar que ambas imágenes tengan el mismo número de canales
     cv::Mat origColor, denoisedColor;
     
     if(currentImage.channels() == 1) {
@@ -556,26 +639,155 @@ void MainWindow::on_pushButton_3_clicked()
     
     if(denoised.channels() == 1) {
         cv::cvtColor(denoised, denoisedColor, cv::COLOR_GRAY2BGR);
-    } else {
+    } else if(denoised.channels() == 3) {
         denoisedColor = denoised.clone();
+    } else if(denoised.channels() == 4) {
+        cv::cvtColor(denoised, denoisedColor, cv::COLOR_BGRA2BGR);
     }
     
+    // 10. Redimensionar si es necesario para que coincidan
+    if(origColor.size() != denoisedColor.size()) {
+        cv::resize(denoisedColor, denoisedColor, origColor.size());
+    }
+    
+    // 11. Crear comparación lado a lado
+    cv::Mat comparison;
     cv::hconcat(origColor, denoisedColor, comparison);
     
-    // Agregar texto
-    cv::putText(comparison, "Original", cv::Point(10, 30), 
+    // 12. Agregar texto descriptivo
+    cv::putText(comparison, "Original (con ruido)", cv::Point(10, 30), 
                 cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
-    cv::putText(comparison, "DNN Denoised", cv::Point(origColor.cols + 10, 30), 
+    cv::putText(comparison, "DnCNN Pre-entrenado", 
+                cv::Point(origColor.cols + 10, 30), 
                 cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
+    
+    // Agregar información del modelo en la parte inferior
+    cv::putText(comparison, "Modelo: DnCNN Gray Blind", 
+                cv::Point(10, comparison.rows - 10), 
+                cv::FONT_HERSHEY_SIMPLEX, 0.5, cv::Scalar(255, 255, 255), 1);
 
-    // Mostrar en label_3
+    // 13. Mostrar en label_3
     ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(comparison)
                           .scaled(ui->label_3->width(), ui->label_3->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
     
-    // También guardar como archivo
-    cv::imwrite("output/dnn_comparison.png", comparison);
+    // 14. Guardar comparación
+    QString comparisonPath = "output/dnn_comparison.png";
+    cv::imwrite(comparisonPath.toStdString(), comparison);
     
-    QMessageBox::information(this, "DNN Denoising", 
-                            "Denoising completado.\nComparación guardada en: output/dnn_comparison.png");
+    // 15. Limpiar archivo temporal
+    QFile::remove(tempImagePath);
+    
+    // 16. Mostrar mensaje de éxito
+    QMessageBox::information(this, "DnCNN Denoising", 
+                            "✓ Denoising completado exitosamente!\n\n"
+                            "Modelo usado: DnCNN Gray Blind (pre-entrenado)\n"
+                            "Resultado guardado en: " + comparisonPath + "\n\n"
+                            "Salida de Python:\n" + stdOutput);
 }
+
+// ==================== ALTERNATIVA: Versión Asíncrona (No bloquea UI) ====================
+// Si prefieres que no se congele la interfaz, usa esta versión:
+
+void MainWindow::on_pushButton_3_clicked_async()
+{
+    if(currentImage.empty()) {
+        QMessageBox::warning(this, "Error", "Cargue una imagen primero.");
+        return;
+    }
+
+    // Guardar imagen temporal
+    QString tempImagePath = "temp_input.png";
+    cv::imwrite(tempImagePath.toStdString(), currentImage);
+    
+    // Crear proceso
+    QProcess *process = new QProcess(this);
+    
+    // Conectar señal de finalización
+    connect(process, QOverload<int, QProcess::ExitStatus>::of(&QProcess::finished),
+            this, [this, process, tempImagePath](int exitCode, QProcess::ExitStatus exitStatus) {
+        
+        QString stdOutput = process->readAllStandardOutput();
+        QString stdError = process->readAllStandardError();
+        
+        if(exitCode == 0 && exitStatus == QProcess::NormalExit) {
+            // Éxito: cargar y mostrar resultado
+            cv::Mat denoised = cv::imread("output/resultado_denoising.png");
+            
+            if(!denoised.empty()) {
+                // Crear comparación
+                cv::Mat origColor, denoisedColor;
+                
+                if(currentImage.channels() == 1) {
+                    cv::cvtColor(currentImage, origColor, cv::COLOR_GRAY2BGR);
+                } else {
+                    origColor = currentImage.clone();
+                }
+                
+                if(denoised.channels() == 1) {
+                    cv::cvtColor(denoised, denoisedColor, cv::COLOR_GRAY2BGR);
+                } else {
+                    denoisedColor = denoised.clone();
+                }
+                
+                if(origColor.size() != denoisedColor.size()) {
+                    cv::resize(denoisedColor, denoisedColor, origColor.size());
+                }
+                
+                cv::Mat comparison;
+                cv::hconcat(origColor, denoisedColor, comparison);
+                
+                cv::putText(comparison, "Original", cv::Point(10, 30), 
+                           cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
+                cv::putText(comparison, "DnCNN", cv::Point(origColor.cols + 10, 30), 
+                           cv::FONT_HERSHEY_SIMPLEX, 1.0, cv::Scalar(0, 255, 0), 2);
+                
+                ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(comparison)
+                                      .scaled(ui->label_3->width(), ui->label_3->height(), 
+                                             Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+                
+                cv::imwrite("output/dnn_comparison.png", comparison);
+                
+                QMessageBox::information(this, "Éxito", 
+                    "Denoising completado!\n\n" + stdOutput);
+            } else {
+                QMessageBox::warning(this, "Error", 
+                    "No se pudo cargar el resultado.");
+            }
+        } else {
+            QMessageBox::critical(this, "Error", 
+                "Fallo en Python:\n" + stdError + "\n" + stdOutput);
+        }
+        
+        // Limpiar
+        QFile::remove(tempImagePath);
+        process->deleteLater();
+    });
+    
+    // Mostrar mensaje
+    QMessageBox::information(this, "Procesando", 
+        "Aplicando DnCNN en segundo plano...\n"
+        "La interfaz seguirá funcionando mientras se procesa.");
+    
+    // Ejecutar Python
+    QStringList args;
+    args << "main.py" << tempImagePath;
+    process->start("python3", args);
+}
+
+// ==================== HEADER (mainwindow.h) ====================
+// Agrega estos includes al principio de tu mainwindow.h:
+/*
+#include <QProcess>
+#include <QProgressDialog>
+#include <QFile>
+#include <QDir>
+#include <QDebug>
+*/
+
+// Y agrega esta declaración en la sección private de tu clase:
+/*
+private:
+    // ... tus otras variables privadas ...
+    void displayDenoisedResult(const cv::Mat& denoised);  // Si usas versión async
+*/
