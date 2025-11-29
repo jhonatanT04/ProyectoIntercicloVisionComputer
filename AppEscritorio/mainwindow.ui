@@ -53,13 +53,13 @@
      <widget class="QWidget" name="leftPanel">
       <property name="minimumSize">
        <size>
-        <width>320</width>
+        <width>280</width>
         <height>0</height>
        </size>
       </property>
       <property name="maximumSize">
        <size>
-        <width>320</width>
+        <width>280</width>
         <height>16777215</height>
        </size>
       </property>
@@ -76,18 +76,16 @@
             color: white;
             border: none;
             border-radius: 12px;
-            padding: 16px;
-            font-size: 14px;
+            padding: 18px;
+            font-size: 13px;
             font-weight: 600;
             letter-spacing: 0.5px;
-            text-align: left;
-            padding-left: 24px;
         }
         
         QPushButton:hover {
             background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
                                        stop:0 #764ba2, stop:1 #667eea);
-            transform: translateY(-2px);
+            transform: scale(1.02);
         }
         
         QPushButton:pressed {
@@ -100,19 +98,9 @@
                                        stop:0 #56CCF2, stop:1 #2F80ED);
         }
         
-        QPushButton#pushButton:hover {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                                       stop:0 #2F80ED, stop:1 #56CCF2);
-        }
-        
         QPushButton#pushButton_2 {
             background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
                                        stop:0 #11998e, stop:1 #38ef7d);
-        }
-        
-        QPushButton#pushButton_2:hover {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                                       stop:0 #38ef7d, stop:1 #11998e);
         }
         
         QPushButton#pushButton_3 {
@@ -120,42 +108,21 @@
                                        stop:0 #f093fb, stop:1 #f5576c);
         }
         
-        QPushButton#pushButton_3:hover {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                                       stop:0 #f5576c, stop:1 #f093fb);
-        }
-        
-        QListWidget {
-            background-color: rgba(30, 30, 46, 0.8);
-            border: 1px solid rgba(100, 149, 237, 0.2);
+        QLabel#infoBox {
+            background: rgba(30, 30, 46, 0.8);
+            border: 1px solid rgba(100, 149, 237, 0.3);
             border-radius: 12px;
-            padding: 8px;
-            color: #e0e0e0;
-            font-size: 13px;
-        }
-        
-        QListWidget::item {
-            padding: 12px;
-            border-radius: 8px;
-            margin: 4px 0px;
-        }
-        
-        QListWidget::item:hover {
-            background-color: rgba(100, 149, 237, 0.15);
-        }
-        
-        QListWidget::item:selected {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                                       stop:0 rgba(102, 126, 234, 0.3),
-                                       stop:1 rgba(118, 75, 162, 0.3));
-            border-left: 3px solid #667eea;
+            padding: 16px;
+            color: rgba(255, 255, 255, 0.85);
+            font-size: 12px;
+            line-height: 1.6;
         }
        </string>
       </property>
       
       <layout class="QVBoxLayout" name="leftLayout">
        <property name="spacing">
-        <number>12</number>
+        <number>16</number>
        </property>
        <property name="leftMargin">
         <number>20</number>
@@ -183,7 +150,7 @@
           <string notr="true">
            QLabel {
                color: white;
-               font-size: 20px;
+               font-size: 18px;
                font-weight: 700;
                letter-spacing: 2px;
                padding: 16px;
@@ -221,7 +188,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>56</height>
+           <height>52</height>
           </size>
          </property>
          <property name="text">
@@ -233,34 +200,17 @@
         </widget>
        </item>
 
-       <!-- Lista de imágenes -->
+       <!-- Info Box: Red Neuronal -->
        <item>
-        <widget class="QLabel" name="labelListTitle">
+        <widget class="QLabel" name="infoBox">
          <property name="text">
-          <string>Imágenes Procesadas</string>
+          <string>&lt;b style='color: #667eea;'&gt;Red Neuronal DnCNN&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Modelo pre-entrenado para reducción de ruido en imágenes médicas.&lt;br/&gt;&lt;br/&gt;• Arquitectura: 20 capas&lt;br/&gt;• Dataset: BSD68 + Medical&lt;br/&gt;• Ruido: Adaptativo</string>
          </property>
-         <property name="styleSheet">
-          <string notr="true">
-           QLabel {
-               color: rgba(255, 255, 255, 0.7);
-               font-size: 12px;
-               font-weight: 600;
-               letter-spacing: 1px;
-               text-transform: uppercase;
-               padding: 8px 4px;
-           }
-          </string>
+         <property name="wordWrap">
+          <bool>true</bool>
          </property>
-        </widget>
-       </item>
-
-       <item>
-        <widget class="QListWidget" name="listWidget">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>200</height>
-          </size>
+         <property name="alignment">
+          <set>Qt::AlignLeft|Qt::AlignTop</set>
          </property>
         </widget>
        </item>
@@ -285,7 +235,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>56</height>
+           <height>52</height>
           </size>
          </property>
          <property name="text">
@@ -303,7 +253,7 @@
          <property name="minimumSize">
           <size>
            <width>0</width>
-           <height>56</height>
+           <height>52</height>
           </size>
          </property>
          <property name="text">
@@ -347,22 +297,69 @@
             border: 2px solid rgba(100, 149, 237, 0.2);
             border-radius: 16px;
             padding: 12px;
-            color: white;
+            color: rgba(255, 255, 255, 0.85);
             font-size: 13px;
             font-weight: 600;
-            backdrop-filter: blur(10px);
         }
         
         QLabel[frameShape="4"]:hover {
             border-color: rgba(100, 149, 237, 0.5);
             background: rgba(30, 30, 46, 0.8);
         }
+        
+        QLabel.imageTitle {
+            color: rgba(255, 255, 255, 0.9);
+            font-size: 12px;
+            font-weight: 700;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            padding: 8px 0px;
+        }
+        
+        QLabel.sliderLabel {
+            color: rgba(255, 255, 255, 0.8);
+            font-size: 11px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+        }
+        
+        QSlider::groove:horizontal {
+            height: 6px;
+            background: rgba(50, 50, 70, 0.6);
+            border-radius: 3px;
+        }
+        
+        QSlider::handle:horizontal {
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 #667eea, stop:1 #764ba2);
+            border: 2px solid rgba(255, 255, 255, 0.2);
+            width: 16px;
+            height: 16px;
+            margin: -5px 0;
+            border-radius: 8px;
+        }
+        
+        QSlider::handle:horizontal:hover {
+            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                       stop:0 #764ba2, stop:1 #667eea);
+            border-color: rgba(255, 255, 255, 0.5);
+            width: 18px;
+            height: 18px;
+            margin: -6px 0;
+            border-radius: 9px;
+        }
+        
+        QSlider::sub-page:horizontal {
+            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                       stop:0 #667eea, stop:1 #764ba2);
+            border-radius: 3px;
+        }
        </string>
       </property>
       
       <layout class="QVBoxLayout" name="rightLayout">
        <property name="spacing">
-        <number>20</number>
+        <number>24</number>
        </property>
        <property name="leftMargin">
         <number>24</number>
@@ -377,377 +374,389 @@
         <number>24</number>
        </property>
 
-       <!-- Grid de Imágenes -->
+       <!-- Grid de Imágenes con Controles -->
        <item>
-        <layout class="QGridLayout" name="imagesGrid">
-         <property name="horizontalSpacing">
-          <number>16</number>
-         </property>
-         <property name="verticalSpacing">
-          <number>16</number>
+        <layout class="QHBoxLayout" name="imagesRow" stretch="1,1,1">
+         <property name="spacing">
+          <number>20</number>
          </property>
 
-         <!-- Fila 1 -->
-         <item row="0" column="0">
-          <widget class="QLabel" name="label">
-           <property name="text">
-            <string>Pipeline Final</string>
+         <!-- ========== COLUMNA 1: IMAGEN SUAVIZADA ========== -->
+         <item>
+          <layout class="QVBoxLayout" name="column1">
+           <property name="spacing">
+            <number>12</number>
            </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>300</width>
-             <height>300</height>
-            </size>
-           </property>
-           <property name="scaledContents">
-            <bool>false</bool>
-           </property>
-          </widget>
+           
+           <item>
+            <widget class="QLabel" name="titleImage1">
+             <property name="text">
+              <string>IMAGEN SUAVIZADA</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">color: rgba(255, 255, 255, 0.9); font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+
+           <item>
+            <widget class="QLabel" name="label">
+             <property name="text">
+              <string>Imagen sin procesar</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::Box</enum>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>380</width>
+               <height>380</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+
+           <!-- Controles Imagen 1 -->
+           <item>
+            <layout class="QVBoxLayout" name="controls1">
+             <property name="spacing">
+              <number>8</number>
+             </property>
+             
+             <item>
+              <widget class="QLabel" name="labelSlider1">
+               <property name="text">
+                <string>Intensidad de Hueso</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+              </widget>
+             </item>
+
+             <item>
+              <widget class="QLabel" name="labelSlider2">
+               <property name="text">
+                <string>Reducción de Ruido</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_2">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+              </widget>
+             </item>
+
+             <item>
+              <widget class="QLabel" name="labelSlider3">
+               <property name="text">
+                <string>Suavizado</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_3">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+              </widget>
+             </item>
+
+            </layout>
+           </item>
+          </layout>
          </item>
 
-         <item row="0" column="1">
-          <widget class="QLabel" name="label_3">
-           <property name="text">
-            <string>✨ Región Resaltada</string>
+         <!-- ========== COLUMNA 2: RED NEURONAL ========== -->
+         <item>
+          <layout class="QVBoxLayout" name="column2">
+           <property name="spacing">
+            <number>12</number>
            </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>300</width>
-             <height>300</height>
-            </size>
-           </property>
-          </widget>
+           
+           <item>
+            <widget class="QLabel" name="titleImage2">
+             <property name="text">
+              <string>RED NEURONAL DnCNN</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">color: #f093fb; font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+
+           <item>
+            <widget class="QLabel" name="label_3">
+             <property name="text">
+              <string>Presione "Aplicar Red Neuronal"</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::Box</enum>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>380</width>
+               <height>380</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+
+           <!-- Controles Imagen 2 -->
+           <item>
+            <layout class="QVBoxLayout" name="controls2">
+             <property name="spacing">
+              <number>8</number>
+             </property>
+             
+             <item>
+              <widget class="QLabel" name="labelSlider4">
+               <property name="text">
+                <string>Nivel de Umbral</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_4">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+              </widget>
+             </item>
+
+             <item>
+              <widget class="QLabel" name="labelSlider5">
+               <property name="text">
+                <string>Kernel Morfológico</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_5">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+              </widget>
+             </item>
+
+             <item>
+              <widget class="QLabel" name="labelSlider6">
+               <property name="text">
+                <string>Contraste CLAHE</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_6">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+              </widget>
+             </item>
+
+            </layout>
+           </item>
+          </layout>
          </item>
 
-         <item row="0" column="2">
-          <widget class="QLabel" name="label_2">
-           <property name="text">
-            <string>Segmentación</string>
+         <!-- ========== COLUMNA 3: SEGMENTACIÓN ========== -->
+         <item>
+          <layout class="QVBoxLayout" name="column3">
+           <property name="spacing">
+            <number>12</number>
            </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>300</width>
-             <height>300</height>
-            </size>
-           </property>
-          </widget>
+           
+           <item>
+            <widget class="QLabel" name="titleImage3">
+             <property name="text">
+              <string>SEGMENTACIÓN</string>
+             </property>
+             <property name="styleSheet">
+              <string notr="true">color: rgba(255, 255, 255, 0.9); font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+            </widget>
+           </item>
+
+           <item>
+            <widget class="QLabel" name="label_2">
+             <property name="text">
+              <string>Máscara de segmentación</string>
+             </property>
+             <property name="alignment">
+              <set>Qt::AlignCenter</set>
+             </property>
+             <property name="frameShape">
+              <enum>QFrame::Box</enum>
+             </property>
+             <property name="minimumSize">
+              <size>
+               <width>380</width>
+               <height>380</height>
+              </size>
+             </property>
+            </widget>
+           </item>
+
+           <!-- Controles Imagen 3 -->
+           <item>
+            <layout class="QVBoxLayout" name="controls3">
+             <property name="spacing">
+              <number>8</number>
+             </property>
+             
+             <item>
+              <widget class="QLabel" name="labelSlider7">
+               <property name="text">
+                <string>Rango Mínimo</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_7">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <number>255</number>
+               </property>
+               <property name="value">
+                <number>50</number>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+              </widget>
+             </item>
+
+             <item>
+              <widget class="QLabel" name="labelSlider8">
+               <property name="text">
+                <string>Rango Máximo</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_8">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="minimum">
+                <number>0</number>
+               </property>
+               <property name="maximum">
+                <number>255</number>
+               </property>
+               <property name="value">
+                <number>200</number>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+              </widget>
+             </item>
+
+             <item>
+              <widget class="QLabel" name="labelSlider9">
+               <property name="text">
+                <string>Erosión</string>
+               </property>
+               <property name="styleSheet">
+                <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
+               </property>
+              </widget>
+             </item>
+             <item>
+              <widget class="QSlider" name="horizontalSlider_9">
+               <property name="orientation">
+                <enum>Qt::Horizontal</enum>
+               </property>
+               <property name="minimum">
+                <number>1</number>
+               </property>
+               <property name="maximum">
+                <number>15</number>
+               </property>
+               <property name="value">
+                <number>3</number>
+               </property>
+               <property name="cursor">
+                <cursorShape>PointingHandCursor</cursorShape>
+               </property>
+              </widget>
+             </item>
+
+            </layout>
+           </item>
+          </layout>
          </item>
-
-         <!-- Fila 2: Imágenes adicionales -->
-         <!-- <item row="1" column="0">
-          <widget class="QLabel" name="label_4">
-           <property name="text">
-            <string>Overlay Multicolor</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>300</width>
-             <height>300</height>
-            </size>
-           </property>
-          </widget>
-         </item>
-
-         <item row="1" column="1">
-          <widget class="QLabel" name="label_5">
-           <property name="text">
-            <string>Extracción Ósea</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>300</width>
-             <height>300</height>
-            </size>
-           </property>
-          </widget>
-         </item> -->
-
-         <!-- <item row="1" column="2">
-          <widget class="QLabel" name="label_6">
-           <property name="text">
-            <string>Heatmap</string>
-           </property>
-           <property name="alignment">
-            <set>Qt::AlignCenter</set>
-           </property>
-           <property name="frameShape">
-            <enum>QFrame::Box</enum>
-           </property>
-           <property name="minimumSize">
-            <size>
-             <width>300</width>
-             <height>300</height>
-            </size>
-           </property>
-          </widget>
-         </item> -->
 
         </layout>
-       </item>
-
-       <!-- Panel de Controles (Sliders) -->
-       <item>
-        <widget class="QWidget" name="controlsPanel">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>180</height>
-          </size>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">
-           QWidget#controlsPanel {
-               background: rgba(30, 30, 46, 0.7);
-               border: 2px solid rgba(100, 149, 237, 0.2);
-               border-radius: 16px;
-               padding: 20px;
-           }
-           
-           QLabel {
-               color: rgba(255, 255, 255, 0.9);
-               font-size: 13px;
-               font-weight: 600;
-               letter-spacing: 0.5px;
-           }
-           
-           QSlider::groove:horizontal {
-               height: 8px;
-               background: rgba(50, 50, 70, 0.8);
-               border-radius: 4px;
-           }
-           
-           QSlider::handle:horizontal {
-               background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                          stop:0 #667eea, stop:1 #764ba2);
-               border: 2px solid rgba(255, 255, 255, 0.3);
-               width: 18px;
-               height: 18px;
-               margin: -5px 0;
-               border-radius: 9px;
-           }
-           
-           QSlider::handle:horizontal:hover {
-               background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
-                                          stop:0 #764ba2, stop:1 #667eea);
-               border-color: rgba(255, 255, 255, 0.6);
-           }
-           
-           QSlider::sub-page:horizontal {
-               background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
-                                          stop:0 #667eea, stop:1 #764ba2);
-               border-radius: 4px;
-           }
-          </string>
-         </property>
-         
-         <layout class="QGridLayout" name="slidersGrid">
-          <property name="horizontalSpacing">
-           <number>24</number>
-          </property>
-          <property name="verticalSpacing">
-           <number>12</number>
-          </property>
-
-          <!-- Slider 1: Gaussian -->
-          <item row="0" column="0">
-           <widget class="QLabel" name="labelSlider1">
-            <property name="text">
-             <string>Gaussian Blur</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="0">
-           <widget class="QSlider" name="horizontalSlider">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>15</number>
-            </property>
-            <property name="value">
-             <number>5</number>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
-            </property>
-           </widget>
-          </item>
-
-          <!-- Slider 2: Median -->
-          <item row="0" column="1">
-           <widget class="QLabel" name="labelSlider2">
-            <property name="text">
-             <string>Median Filter</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="1">
-           <widget class="QSlider" name="horizontalSlider_2">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>15</number>
-            </property>
-            <property name="value">
-             <number>5</number>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
-            </property>
-           </widget>
-          </item>
-
-          <!-- Slider 3: CLAHE -->
-          <item row="0" column="2">
-           <widget class="QLabel" name="labelSlider3">
-            <property name="text">
-             <string>CLAHE Contrast</string>
-            </property>
-           </widget>
-          </item>
-          <item row="1" column="2">
-           <widget class="QSlider" name="horizontalSlider_3">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="minimum">
-             <number>10</number>
-            </property>
-            <property name="maximum">
-             <number>50</number>
-            </property>
-            <property name="value">
-             <number>30</number>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
-            </property>
-           </widget>
-          </item>
-
-          <!-- Slider 4: Threshold -->
-          <item row="2" column="0">
-           <widget class="QLabel" name="labelSlider4">
-            <property name="text">
-             <string>Threshold Level</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="0">
-           <widget class="QSlider" name="horizontalSlider_4">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="minimum">
-             <number>0</number>
-            </property>
-            <property name="maximum">
-             <number>255</number>
-            </property>
-            <property name="value">
-             <number>128</number>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
-            </property>
-           </widget>
-          </item>
-
-          <!-- Slider 5: Morph -->
-          <item row="2" column="1">
-           <widget class="QLabel" name="labelSlider5">
-            <property name="text">
-             <string>Morph Kernel</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="1">
-           <widget class="QSlider" name="horizontalSlider_5">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>15</number>
-            </property>
-            <property name="value">
-             <number>5</number>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
-            </property>
-           </widget>
-          </item>
-          
-            <!-- Slider 6: -->
-          <item row="2" column="2">
-           <widget class="QLabel" name="labelSlider6">
-            <property name="text">
-             <string>Slider</string>
-            </property>
-           </widget>
-          </item>
-          <item row="3" column="2">
-           <widget class="QSlider" name="horizontalSlider_6">
-            <property name="orientation">
-             <enum>Qt::Horizontal</enum>
-            </property>
-            <property name="minimum">
-             <number>1</number>
-            </property>
-            <property name="maximum">
-             <number>15</number>
-            </property>
-            <property name="value">
-             <number>5</number>
-            </property>
-            <property name="cursor">
-             <cursorShape>PointingHandCursor</cursorShape>
-            </property>
-           </widget>
-          </item>
-
-         </layout>
-        </widget>
        </item>
 
       </layout>
@@ -757,7 +766,7 @@
    </layout>
   </widget>
 
-  <!-- MenuBar con estilo -->
+  <!-- MenuBar -->
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
@@ -789,7 +798,7 @@
    </property>
   </widget>
 
-  <!-- StatusBar con estilo -->
+  <!-- StatusBar -->
   <widget class="QStatusBar" name="statusbar">
    <property name="styleSheet">
     <string notr="true">

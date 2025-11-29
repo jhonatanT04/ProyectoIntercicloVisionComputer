@@ -169,30 +169,47 @@ def reducir_ruido_ct(ruta_imagen, mostrar_resultados=True):
 
 # ==================== EJEMPLO DE USO ====================
 if __name__ == "__main__":
-    # Ruta de la imagen CT a procesar
-    ruta_imagen = "imgAnalizar/ApicePulmonar/L143_QD_1_1.CT.0004.0053.2015.12.22.20.45.11.504991.358762830.IMA"
+    import sys
     
-    # OPCIÓN: Buscar automáticamente todas las imágenes en la carpeta
-    # Descomenta para procesar múltiples imágenes:
-    """
-    dataset_path = "imgAnalizar/ApicePulmonar"
-    archivos = [f for f in os.listdir(dataset_path) if f.endswith(('.IMA', '.dcm', '.png', '.jpg'))]
-    for archivo in archivos[:5]:  # Procesar las primeras 5
-        ruta_imagen = os.path.join(dataset_path, archivo)
-        print(f"\n{'='*60}\nProcesando: {archivo}\n{'='*60}")
-        reducir_ruido_ct(ruta_imagen)
-    """
+    # Obtener ruta de imagen desde argumentos o usar default
+    if len(sys.argv) > 1:
+        ruta_imagen = sys.argv[1]
+        print(f"📥 Imagen recibida desde Qt: {ruta_imagen}")
+    else:
+        # Ruta por defecto si se ejecuta directamente
+        ruta_imagen = "imgAnalizar/ApicePulmonar/L143_QD_1_1.CT.0004.0053.2015.12.22.20.45.11.504991.358762830.IMA"
+        print(f"📂 Usando ruta por defecto: {ruta_imagen}")
     
     # Verificar que la ruta existe
-    if os.path.exists(ruta_imagen):
-        img_limpia, img_original = reducir_ruido_ct(ruta_imagen)
-        print("\n✓ Procesamiento completado exitosamente!")
+    if not os.path.exists(ruta_imagen):
+        print(f"❌ Error: No se encontró la imagen en '{ruta_imagen}'")
+        sys.exit(1)
+    
+    try:
+        # Procesar imagen
+        img_limpia, img_original = reducir_ruido_ct(ruta_imagen, mostrar_resultados=False)
+        
+        # Guardar resultado para Qt
+        output_dir = "output"
+        os.makedirs(output_dir, exist_ok=True)
+        
+        # Convertir a 0-255 y guardar
+        img_salida = (img_limpia * 255).astype(np.uint8)
+        output_path = os.path.join(output_dir, "resultado_denoising.png")
+        cv2.imwrite(output_path, img_salida)
+        
+        print(f"\n✓ Procesamiento completado exitosamente!")
         print(f"  - Imagen original: {img_original.shape}")
         print(f"  - Imagen procesada: {img_limpia.shape}")
-    else:
-        print(f"❌ Error: No se encontró la imagen en '{ruta_imagen}'")
-        print("\nPor favor, actualiza 'ruta_imagen' con la ruta correcta.")
-        print("Ejemplo: ruta_imagen = 'C_0002/image_001.png'")
+        print(f"  - Guardada en: {output_path}")
+        
+        sys.exit(0)
+        
+    except Exception as e:
+        print(f"❌ Error durante el procesamiento: {str(e)}")
+        import traceback
+        traceback.print_exc()
+        sys.exit(1)
 
 # ==================== CARGAR PESOS PRE-ENTRENADOS ====================
 """
