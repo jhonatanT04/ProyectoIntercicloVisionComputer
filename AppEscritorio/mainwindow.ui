@@ -538,6 +538,26 @@
             </widget>
            </item>
 
+           <item>
+            <widget class="QLabel" name="label_4">
+            <property name="text">
+            <string>Resultado Red Neuronal</string>
+            </property>
+            <property name="alignment">
+            <set>Qt::AlignCenter</set>
+            </property>
+            <property name="frameShape">
+            <enum>QFrame::Box</enum>
+            </property>
+            <property name="minimumSize">
+            <size>
+                <width>380</width>
+                <height>380</height>
+            </size>
+            </property>
+            </widget>
+           </item>
+
            <!-- Controles Imagen 2 -->
            <item>
             <layout class="QVBoxLayout" name="controls2">

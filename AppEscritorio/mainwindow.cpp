@@ -421,7 +421,7 @@ void MainWindow::on_pushButton_3_clicked()
     
     // 3. Preparar proceso Python
     QProcess process;
-    QString pythonScript = "main.py";
+    QString pythonScript = "/home/justin/Documentos/VISION/ProyectoIntercicloVisionComputer/main.py";
     QString outputPath = "output/resultado_denoising.png";
     
     // 4. Mostrar barra de progreso
@@ -504,7 +504,7 @@ void MainWindow::on_pushButton_3_clicked()
     }
 
     // 11. MOSTRAR EN LABEL_3 (Columna Red Neuronal)
-    ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(denoisedDisplay)
+    ui->label_4->setPixmap(QPixmap::fromImage(matToQImage(denoisedDisplay)
                           .scaled(ui->label_3->width(), ui->label_3->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
     
