@@ -93,11 +93,11 @@ QImage MainWindow::matToQImage(const cv::Mat &mat)
 // ==================== BOTÓN 1: Cargar Imagen ====================
 void MainWindow::on_pushButton_clicked()
 {
-    // QString fileName = QFileDialog::getOpenFileName(
-    //      this, "Seleccionar imagen CT", "",
-    //      "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
+    QString fileName = QFileDialog::getOpenFileName(
+          this, "Seleccionar imagen CT", "",
+          "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
     
-    QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
+    //QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
     if(fileName.isEmpty()) return;
 
     if (!processor->loadImage(fileName.toStdString())) {
@@ -256,6 +256,8 @@ void MainWindow::updateFilters()
     // ============================================================
     // PROCESAMIENTO
     // ============================================================
+    Mat imgSuavizada = procesado->filterMedian(filtered, k_n);
+
     Mat img = procesado->getOriginalImage();
     // Mat img = procesado->eliminarCamilla(img);
 
@@ -336,6 +338,10 @@ void MainWindow::updateFilters()
 
     ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(resultado)
                           .scaled(ui->label_3->width(), ui->label_3->height(), 
+                                 Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    
+    ui->label_5->setPixmap(QPixmap::fromImage(matToQImage(imgSuavizada)
+                          .scaled(ui->label_5->width(), ui->label_5->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 }
 

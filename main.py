@@ -6,7 +6,6 @@ from PIL import Image
 import cv2
 import os
 
-# ==================== ARQUITECTURA DnCNN ====================
 class DnCNN(nn.Module):
     """
     Red DnCNN para eliminación de ruido
