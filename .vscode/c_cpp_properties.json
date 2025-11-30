@@ -8,7 +8,9 @@
                 "/usr/include/qt6/QtWidgets",
                 "/usr/include/qt",
                 "/usr/include/qt/QtGui",
-                "/usr/local/include/ITK-6.0"
+                "/usr/local/include/ITK-6.0",
+                "/usr/include/qt6/QtCore",
+                "/usr/include/qt6"
             ],
             "defines": [],
             "compilerPath": "/usr/bin/clang",

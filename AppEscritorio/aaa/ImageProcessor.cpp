@@ -487,7 +487,7 @@ Mat ImageProcessor::morphDilation( Mat input, int ksize) {
 
 Mat ImageProcessor::morphOpening( Mat input, int ksize) {
     Mat output;
-    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
+    Mat kernel = getStructuringElement(MORPH_RECT, cv::Size(ksize, ksize));
     morphologyEx(input, output, MORPH_OPEN, kernel);
     return output;
 }
@@ -595,7 +595,49 @@ Mat ImageProcessor::highlightRegion(String name,Mat mask,  Mat background, Scala
     return output;
 }
 
-
+Mat ImageProcessor::eliminarCamilla(Mat img) {
+    
+    // 1. Umbralizar
+    Mat binaria;
+    threshold(img, binaria, 30, 255, THRESH_BINARY);
+    
+    // 2. Eliminar ruido con morfología
+    Mat limpia = morphClosing(binaria, 10);
+    
+    // 3. Encontrar todos los contornos
+    vector<vector<cv::Point>> contours;
+    findContours(limpia.clone(), contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    
+    // 4. Encontrar el contorno más grande (el cuerpo)
+    if (contours.empty()) {
+        cout << "No se encontraron contornos" << endl;
+        return img;
+    }
+    
+    int indiceMax = 0;
+    double areaMax = 0;
+    
+    for (size_t i = 0; i < contours.size(); i++) {
+        double area = contourArea(contours[i]);
+        if (area > areaMax) {
+            areaMax = area;
+            indiceMax = i;
+        }
+    }
+    
+    // 5. Crear máscara solo con el contorno del cuerpo
+    Mat maskCuerpo = Mat::zeros(img.size(), CV_8U);
+    drawContours(maskCuerpo, contours, indiceMax, Scalar(255), -1);
+    
+    // 6. Erosionar un poco para eliminar piel/grasa superficial
+    Mat maskErosionada = morphErosion(maskCuerpo, 10);
+    
+    // 7. Aplicar máscara
+    Mat resultado = Mat::zeros(img.size(), CV_8U);
+    img.copyTo(resultado, maskErosionada);
+    
+    return resultado;
+}
 
 
 

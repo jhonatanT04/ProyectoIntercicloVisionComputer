@@ -20,13 +20,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->horizontalSlider_3->setRange(0, 30);   
     ui->horizontalSlider_3->setValue(0);
 
-    ui->horizontalSlider_4->setRange(0, 255);   
+
+    ui->horizontalSlider_4->setRange(30, 255);   
     ui->horizontalSlider_4->setValue(125);
 
     ui->horizontalSlider_5->setRange(1, 255);   
     ui->horizontalSlider_5->setValue(5);
 
-    ui->horizontalSlider_6->setRange(1, 21);    
+    ui->horizontalSlider_6->setRange(1, 200);    
     ui->horizontalSlider_6->setValue(8);
     
     // Conectar sliders para tiempo real
@@ -77,10 +78,10 @@ QImage MainWindow::matToQImage(const cv::Mat &mat)
 // ==================== BOTÓN 1: Cargar Imagen ====================
 void MainWindow::on_pushButton_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(
-         this, "Seleccionar imagen CT", "",
-         "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
-
+    // QString fileName = QFileDialog::getOpenFileName(
+    //      this, "Seleccionar imagen CT", "",
+    //      "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
+    QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L14.IMA";
     if(fileName.isEmpty()) return;
 
     if (!processor->loadImage(fileName.toStdString())) {
@@ -222,6 +223,10 @@ void MainWindow::updateFilters()
     int b_h = std::max(1, ui->horizontalSlider_2->value() | 1);
     int k_n = std::max(1, ui->horizontalSlider_3->value() | 1);
     
+    int a_m = ui->horizontalSlider_4->value();
+    int b_m = ui->horizontalSlider_5->value();
+    int c_m = ui->horizontalSlider_6->value();
+
     int threshValue = ui->horizontalSlider_4->value();
     int morphSize = std::max(1, ui->horizontalSlider_5->value() | 1);
 
@@ -231,53 +236,118 @@ void MainWindow::updateFilters()
     // PROCESAMIENTO
     // ============================================================
     Mat img = procesado->getOriginalImage();
-    Mat imgCLAHE = processor->applyCLAHE(img, 3);
+    // Mat img = procesado->eliminarCamilla(img);
+
+    Mat imgCLAHE = processor->applyCLAHE( procesado->eliminarCamilla(img), 3);
     Mat imgMejoramiento = processor->segmentByIntensity(imgCLAHE, a_h, 255);
 
     Mat imgMejSuavizada = processor->filterNLMeans(imgMejoramiento);
     Mat suavizada2 = processor->filterMedian(imgMejSuavizada, b_h);
     suavizada2 = processor->morphDilation(suavizada2, k_n);
 
-    filtered = processor->normalize(filtered);
-    filtered = processor->applyCLAHE(filtered, ui->horizontalSlider_3->value() / 10.0);
     
-    filtered = processor->filterGaussian(filtered, std::max(1, ui->horizontalSlider->value() | 1));
-    filtered = processor->filterMedian(filtered, std::max(1, ui->horizontalSlider_2->value() | 1));
+        
+    // PASO 1: Preprocesamiento - CLAHE para mejorar contraste
+    Mat imgCLAHEmus = procesado->applyCLAHE(procesado->eliminarCamilla(img), 3.0);
     
-    cv::Mat tophat = processor->morphTopHat(filtered, 3);
-    cv::Mat blackhat = processor->morphBlackHat(filtered, 3);
-    cv::addWeighted(filtered, 1.0, tophat, 0.5, 0, filtered);
-    cv::addWeighted(filtered, 1.0, blackhat, 0.3, 0, filtered);
+    // PASO 2: Suavizado para reducir ruido
+    Mat imgBlur;
+    GaussianBlur(imgCLAHEmus, imgBlur, Size(5, 5), 0);
     
-    cv::Mat thresholded = processor->threshold(filtered, threshValue);
-    thresholded = processor->morphOpening(thresholded, morphSize);
-    thresholded = processor->morphClosing(thresholded, morphSize);
+    // PASO 3: Eliminar la camilla/fondo
+    Mat maskCuerpo = imgBlur;
     
-    cv::Mat edges = processor->edgeCanny(filtered, 50, 150);
-    cv::Mat morphGrad = processor->morphGradient(filtered, 3);
+    // PASO 4: Segmentación por intensidad de músculos
+    // Los músculos tienen intensidad media (50-120 aproximadamente)
+    Mat maskMusculos;
+    inRange(imgBlur, Scalar(a_m), Scalar(b_m), maskMusculos);
     
-    cv::Mat overlay = processor->createColorOverlay(currentImage, thresholded, 
-                                                     cv::Scalar(0, 255, 0), 0.5);
+    // PASO 5: Aplicar máscara del cuerpo para eliminar exterior
+    Mat maskMusculosCuerpo;
+    bitwise_and(maskMusculos, maskCuerpo, maskMusculosCuerpo);
     
-    cv::Mat finalVis;
-    cv::cvtColor(filtered, finalVis, cv::COLOR_GRAY2BGR);
-    cv::Mat edgeColor;
-    cv::cvtColor(edges, edgeColor, cv::COLOR_GRAY2BGR);
-    edgeColor.setTo(cv::Scalar(0, 255, 255), edges);
-    cv::addWeighted(finalVis, 0.8, edgeColor, 0.2, 0, finalVis);
+    // PASO 6: Eliminar estructuras óseas (alta intensidad)
+    Mat maskHuesos = procesado->filterMedian(imgMejoramiento,k_n);
+    Mat maskHuesosInv;
+    bitwise_not(maskHuesos, maskHuesosInv);
+    
+    // Quitar huesos de la máscara muscular
+    Mat maskMusculosSinHuesos;
+    bitwise_and(maskMusculosCuerpo, maskHuesosInv, maskMusculosSinHuesos);
+    
+    // PASO 7: Eliminar grasa subcutánea (intensidad muy baja)
+    Mat maskGrasa;
+    inRange(imgBlur, Scalar(12), Scalar(12), maskGrasa);
+    Mat maskGrasaInv;
+    bitwise_not(maskGrasa, maskGrasaInv);
+    
+    bitwise_and(maskMusculosSinHuesos, maskGrasaInv, maskMusculosSinHuesos);
+    
+    // PASO 8: Limpieza morfológica
+    // Opening para eliminar ruido pequeño
+    Mat maskLimpia = processor->morphOpening(maskMusculosSinHuesos, 3);
+    
+    // Closing para rellenar huecos internos
+    maskLimpia = processor->morphClosing(maskLimpia, 5);
+    
+    // PASO 9: Refinamiento de bordes
+    Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+    erode(maskLimpia, maskLimpia, kernel, Point(-1, -1), 1);
+    dilate(maskLimpia, maskLimpia, kernel, Point(-1, -1), 1);
+    
+    // PASO 10: Crear visualización con color (opcional)
+    Mat resultado = processor->createColorOverlay(img, maskLimpia, Scalar(0, 255, 255), 0.6);
+        
+
+
+
+
+    // filtered = processor->normalize(filtered);
+    // filtered = processor->applyCLAHE(filtered, ui->horizontalSlider_3->value() / 10.0);
+    
+    // filtered = processor->filterGaussian(filtered, std::max(1, ui->horizontalSlider->value() | 1));
+    // filtered = processor->filterMedian(filtered, std::max(1, ui->horizontalSlider_2->value() | 1));
+    
+    // cv::Mat tophat = processor->morphTopHat(filtered, 3);
+    // cv::Mat blackhat = processor->morphBlackHat(filtered, 3);
+    // cv::addWeighted(filtered, 1.0, tophat, 0.5, 0, filtered);
+    // cv::addWeighted(filtered, 1.0, blackhat, 0.3, 0, filtered);
+    
+    // cv::Mat thresholded = processor->threshold(filtered, threshValue);
+    // thresholded = processor->morphOpening(thresholded, morphSize);
+    // thresholded = processor->morphClosing(thresholded, morphSize);
+    
+    // cv::Mat edges = processor->edgeCanny(filtered, 50, 150);
+    // cv::Mat morphGrad = processor->morphGradient(filtered, 3);
+    
+    // cv::Mat overlay = processor->createColorOverlay(currentImage, thresholded, 
+    //                                                  cv::Scalar(0, 255, 0), 0.5);
+    
+    // cv::Mat finalVis;
+    // cv::cvtColor(filtered, finalVis, cv::COLOR_GRAY2BGR);
+    // cv::Mat edgeColor;
+    // cv::cvtColor(edges, edgeColor, cv::COLOR_GRAY2BGR);
+    // edgeColor.setTo(cv::Scalar(0, 255, 255), edges);
+    // cv::addWeighted(finalVis, 0.8, edgeColor, 0.2, 0, finalVis);
+
+
+
+
+
+
 
     // ============================================================
     // MOSTRAR RESULTADOS
     // ============================================================
-    ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->filterMedian(img, 3))
+    ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(img, imgMejoramiento, Scalar(255, 0, 0), 0.6))
                         .scaled(ui->label->width(), ui->label->height(), 
                                Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
-    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(img, imgMejoramiento, Scalar(0, 0, 255), 0.8))
+    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(img)
                           .scaled(ui->label_2->width(), ui->label_2->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
-    ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(procesado->highlightRegion("Hueso", suavizada2, img, Scalar(255, 0, 255)))
+    ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(resultado)
                           .scaled(ui->label_3->width(), ui->label_3->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 }
