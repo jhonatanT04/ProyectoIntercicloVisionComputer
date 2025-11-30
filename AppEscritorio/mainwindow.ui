@@ -454,6 +454,46 @@
            </layout>
           </item>
 
+          <item row="0" column="2">
+           <layout class="QVBoxLayout" name="column1_top">
+            <property name="spacing">
+             <number>12</number>
+            </property>
+            <item>
+             <widget class="QLabel" name="titleImage2">
+              <property name="text">
+               <string>IMAGEN RESULTANTE</string>
+              </property>
+              <property name="styleSheet">
+               <string notr="true">color: #f093fb; font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+             </widget>
+            </item>
+            <item>
+             <widget class="QLabel" name="label_6">
+              <property name="text">
+               <string>Imagen suavizada (OpenCV)</string>
+              </property>
+              <property name="alignment">
+               <set>Qt::AlignCenter</set>
+              </property>
+              <property name="frameShape">
+               <enum>QFrame::Box</enum>
+              </property>
+              <property name="minimumSize">
+               <size>
+                <width>380</width>
+                <height>380</height>
+               </size>
+              </property>
+             </widget>
+            </item>
+           </layout>
+          </item>
+
           <item row="1" column="0" colspan="3">
            <spacer name="horizontalSpacer_separator">
             <property name="orientation">
