@@ -27,8 +27,17 @@ MainWindow::MainWindow(QWidget *parent)
     ui->horizontalSlider_5->setRange(1, 255);   
     ui->horizontalSlider_5->setValue(5);
 
-    ui->horizontalSlider_6->setRange(1, 200);    
-    ui->horizontalSlider_6->setValue(8);
+    ui->horizontalSlider_6->setRange(0, 30);    
+    ui->horizontalSlider_6->setValue(3);
+
+    ui->horizontalSlider_7->setRange(30, 255);   
+    ui->horizontalSlider_7->setValue(125);
+
+    ui->horizontalSlider_8->setRange(1, 255);   
+    ui->horizontalSlider_8->setValue(200);
+
+    ui->horizontalSlider_9->setRange(0, 30);    
+    ui->horizontalSlider_9->setValue(5);
     
     // Conectar sliders para tiempo real
     connect(ui->horizontalSlider, &QSlider::valueChanged,
@@ -42,6 +51,12 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->horizontalSlider_5, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
     connect(ui->horizontalSlider_6, &QSlider::valueChanged,
+            this, &MainWindow::updateFilters);
+    connect(ui->horizontalSlider_7, &QSlider::valueChanged,
+            this, &MainWindow::updateFilters);
+    connect(ui->horizontalSlider_8, &QSlider::valueChanged,
+            this, &MainWindow::updateFilters);
+    connect(ui->horizontalSlider_9, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
 }
 
@@ -82,7 +97,7 @@ void MainWindow::on_pushButton_clicked()
          this, "Seleccionar imagen CT", "",
          "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
     
-    // QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L14.IMA";
+    // QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
     if(fileName.isEmpty()) return;
 
     if (!processor->loadImage(fileName.toStdString())) {
@@ -226,7 +241,12 @@ void MainWindow::updateFilters()
     
     int a_m = ui->horizontalSlider_4->value();
     int b_m = ui->horizontalSlider_5->value();
-    int c_m = ui->horizontalSlider_6->value();
+    int c_m = std::max(1, ui->horizontalSlider_6->value() | 1);
+
+
+    int a_p = ui->horizontalSlider_7->value();
+    int b_p = ui->horizontalSlider_8->value();
+    int c_p = std::max(1, ui->horizontalSlider_9->value() | 1);
 
     int threshValue = ui->horizontalSlider_4->value();
     int morphSize = std::max(1, ui->horizontalSlider_5->value() | 1);
@@ -246,8 +266,8 @@ void MainWindow::updateFilters()
     Mat suavizada2 = processor->filterMedian(imgMejSuavizada, b_h);
     // suavizada2 = processor->morphDilation(suavizada2, k_n);
 
+    Mat pulmones = procesado->deteccionPulmones(procesado->eliminarCamilla(img), a_p,b_p,c_p);
     
-        
     // PASO 1: Preprocesamiento - CLAHE para mejorar contraste
     Mat imgCLAHEmus = procesado->applyCLAHE(procesado->eliminarCamilla(img), 3.0);
     
@@ -263,6 +283,7 @@ void MainWindow::updateFilters()
     Mat maskMusculos;
     inRange(imgBlur, Scalar(a_m), Scalar(b_m), maskMusculos);
     
+
     // PASO 5: Aplicar máscara del cuerpo para eliminar exterior
     Mat maskMusculosCuerpo;
     bitwise_and(maskMusculos, maskCuerpo, maskMusculosCuerpo);
@@ -275,7 +296,7 @@ void MainWindow::updateFilters()
     // Quitar huesos de la máscara muscular
     Mat maskMusculosSinHuesos;
     bitwise_and(maskMusculosCuerpo, maskHuesosInv, maskMusculosSinHuesos);
-    
+
     // PASO 7: Eliminar grasa subcutánea (intensidad muy baja)
     Mat maskGrasa;
     inRange(imgBlur, Scalar(12), Scalar(12), maskGrasa);
@@ -286,7 +307,7 @@ void MainWindow::updateFilters()
     
     // PASO 8: Limpieza morfológica
     // Opening para eliminar ruido pequeño
-    Mat maskLimpia = processor->morphOpening(maskMusculosSinHuesos, 3);
+    Mat maskLimpia = processor->morphOpening(maskSinPulmones, 3);
     
     // Closing para rellenar huecos internos
     maskLimpia = processor->morphClosing(maskLimpia, 5);
@@ -300,37 +321,10 @@ void MainWindow::updateFilters()
     Mat resultado = processor->createColorOverlay(img, maskLimpia, Scalar(0, 255, 255), 0.6);
         
 
+    
 
 
-
-    // filtered = processor->normalize(filtered);
-    // filtered = processor->applyCLAHE(filtered, ui->horizontalSlider_3->value() / 10.0);
     
-    // filtered = processor->filterGaussian(filtered, std::max(1, ui->horizontalSlider->value() | 1));
-    // filtered = processor->filterMedian(filtered, std::max(1, ui->horizontalSlider_2->value() | 1));
-    
-    // cv::Mat tophat = processor->morphTopHat(filtered, 3);
-    // cv::Mat blackhat = processor->morphBlackHat(filtered, 3);
-    // cv::addWeighted(filtered, 1.0, tophat, 0.5, 0, filtered);
-    // cv::addWeighted(filtered, 1.0, blackhat, 0.3, 0, filtered);
-    
-    // cv::Mat thresholded = processor->threshold(filtered, threshValue);
-    // thresholded = processor->morphOpening(thresholded, morphSize);
-    // thresholded = processor->morphClosing(thresholded, morphSize);
-    
-    // cv::Mat edges = processor->edgeCanny(filtered, 50, 150);
-    // cv::Mat morphGrad = processor->morphGradient(filtered, 3);
-    
-    // cv::Mat overlay = processor->createColorOverlay(currentImage, thresholded, 
-    //                                                  cv::Scalar(0, 255, 0), 0.5);
-    
-    // cv::Mat finalVis;
-    // cv::cvtColor(filtered, finalVis, cv::COLOR_GRAY2BGR);
-    // cv::Mat edgeColor;
-    // cv::cvtColor(edges, edgeColor, cv::COLOR_GRAY2BGR);
-    // edgeColor.setTo(cv::Scalar(0, 255, 255), edges);
-    // cv::addWeighted(finalVis, 0.8, edgeColor, 0.2, 0, finalVis);
-
 
 
 
@@ -344,7 +338,7 @@ void MainWindow::updateFilters()
                         .scaled(ui->label->width(), ui->label->height(), 
                                Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
-    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(img)
+    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(img, pulmones, Scalar(0, 155, 0), 0.6))
                           .scaled(ui->label_2->width(), ui->label_2->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 

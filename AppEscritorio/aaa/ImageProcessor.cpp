@@ -196,10 +196,10 @@ Mat ImageProcessor::deteccionHuesos(int a, int b) {
     return maskSoloHuesos;
 }
 
-Mat ImageProcessor::deteccionPulmones(int a, int b,int tamanio) {
+Mat ImageProcessor::deteccionPulmones(Mat img,int a, int b,int tamanio) {
     
     
-    Mat img = m_originalImage.clone();
+    
 
     if (img.empty()) {
         std::cerr << "Error: No se pudo cargar la imagen." << std::endl;

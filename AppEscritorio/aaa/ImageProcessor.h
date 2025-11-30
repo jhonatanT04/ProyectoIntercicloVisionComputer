@@ -16,7 +16,7 @@ public:
 
     bool loadImage(const std::string& filePath);
     Mat deteccionHuesos(int a, int b);
-    Mat deteccionPulmones(int a, int b, int tamanio);
+    Mat deteccionPulmones(Mat img,int a, int b, int tamanio);
     Mat deteccionMuscular(int a, int b);
     Mat imgEcualizada();
     Mat contrastStretching(int a, int b);
