@@ -93,11 +93,11 @@ QImage MainWindow::matToQImage(const cv::Mat &mat)
 // ==================== BOTÓN 1: Cargar Imagen ====================
 void MainWindow::on_pushButton_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(
-         this, "Seleccionar imagen CT", "",
-         "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
+    // QString fileName = QFileDialog::getOpenFileName(
+    //      this, "Seleccionar imagen CT", "",
+    //      "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
     
-    // QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
+    QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
     if(fileName.isEmpty()) return;
 
     if (!processor->loadImage(fileName.toStdString())) {
@@ -283,6 +283,7 @@ void MainWindow::updateFilters()
     Mat maskMusculos;
     inRange(imgBlur, Scalar(a_m), Scalar(b_m), maskMusculos);
     
+    
 
     // PASO 5: Aplicar máscara del cuerpo para eliminar exterior
     Mat maskMusculosCuerpo;
@@ -296,7 +297,7 @@ void MainWindow::updateFilters()
     // Quitar huesos de la máscara muscular
     Mat maskMusculosSinHuesos;
     bitwise_and(maskMusculosCuerpo, maskHuesosInv, maskMusculosSinHuesos);
-
+    
     // PASO 7: Eliminar grasa subcutánea (intensidad muy baja)
     Mat maskGrasa;
     inRange(imgBlur, Scalar(12), Scalar(12), maskGrasa);
@@ -307,7 +308,7 @@ void MainWindow::updateFilters()
     
     // PASO 8: Limpieza morfológica
     // Opening para eliminar ruido pequeño
-    Mat maskLimpia = processor->morphOpening(maskSinPulmones, 3);
+    Mat maskLimpia = processor->morphOpening(maskMusculosSinHuesos, 3);
     
     // Closing para rellenar huecos internos
     maskLimpia = processor->morphClosing(maskLimpia, 5);
@@ -319,16 +320,7 @@ void MainWindow::updateFilters()
     
     // PASO 10: Crear visualización con color (opcional)
     Mat resultado = processor->createColorOverlay(img, maskLimpia, Scalar(0, 255, 255), 0.6);
-        
-
     
-
-
-    
-
-
-
-
 
 
     // ============================================================
