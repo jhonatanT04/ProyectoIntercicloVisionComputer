@@ -78,10 +78,11 @@ QImage MainWindow::matToQImage(const cv::Mat &mat)
 // ==================== BOTÓN 1: Cargar Imagen ====================
 void MainWindow::on_pushButton_clicked()
 {
-    // QString fileName = QFileDialog::getOpenFileName(
-    //      this, "Seleccionar imagen CT", "",
-    //      "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
-    QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L14.IMA";
+    QString fileName = QFileDialog::getOpenFileName(
+         this, "Seleccionar imagen CT", "",
+         "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
+    
+    // QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L14.IMA";
     if(fileName.isEmpty()) return;
 
     if (!processor->loadImage(fileName.toStdString())) {
@@ -243,7 +244,7 @@ void MainWindow::updateFilters()
 
     Mat imgMejSuavizada = processor->filterNLMeans(imgMejoramiento);
     Mat suavizada2 = processor->filterMedian(imgMejSuavizada, b_h);
-    suavizada2 = processor->morphDilation(suavizada2, k_n);
+    // suavizada2 = processor->morphDilation(suavizada2, k_n);
 
     
         
@@ -339,7 +340,7 @@ void MainWindow::updateFilters()
     // ============================================================
     // MOSTRAR RESULTADOS
     // ============================================================
-    ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(img, imgMejoramiento, Scalar(255, 0, 0), 0.6))
+    ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(img, suavizada2, Scalar(255, 0, 0), 0.6))
                         .scaled(ui->label->width(), ui->label->height(), 
                                Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
