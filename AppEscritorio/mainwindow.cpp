@@ -59,8 +59,7 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::updateFilters);
     connect(ui->horizontalSlider_5, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
-    connect(ui->horizontalSlider_6, &QSlider::valueChanged,
-            this, &MainWindow::updateFilters);
+    
     connect(ui->horizontalSlider_7, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
     connect(ui->horizontalSlider_8, &QSlider::valueChanged,
