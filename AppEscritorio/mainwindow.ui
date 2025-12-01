@@ -1,914 +1,1033 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <class>MainWindow</class>
- <widget class="QMainWindow" name="MainWindow">
-  <property name="geometry">
-   <rect>
-    <x>0</x>
-    <y>0</y>
-    <width>1920</width>
-    <height>1080</height>
-   </rect>
-  </property>
-  <property name="windowTitle">
-   <string>CT Image Processor Pro</string>
-  </property>
-  <property name="styleSheet">
-   <string notr="true">
-    QMainWindow {
-        background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #0f0f1e, stop:1 #1a1a2e);
-    }
-   </string>
-  </property>
+    <class>MainWindow</class>
+    <widget class="QMainWindow" name="MainWindow">
+        <property name="geometry">
+            <rect>
+                <x>0</x>
+                <y>0</y>
+                <width>1920</width>
+                <height>1080</height>
+            </rect>
+        </property>
+        <property name="windowTitle">
+            <string>CT Image Processor Pro</string>
+        </property>
+        <property name="styleSheet">
+            <string notr="true">
+                QMainWindow {
+                background: qlineargradient(x1:0, y1:0, x2:1, y2:1, stop:0 #0f0f1e, stop:1 #1a1a2e);
+                }
+            </string>
+        </property>
 
-  <widget class="QWidget" name="centralwidget">
-   <property name="styleSheet">
-    <string notr="true">QWidget#centralwidget { background: transparent; }</string>
-   </property>
-   
-   <layout class="QHBoxLayout" name="mainLayout">
-    <property name="spacing">
-     <number>0</number>
-    </property>
-    <property name="leftMargin">
-     <number>0</number>
-    </property>
-    <property name="topMargin">
-     <number>0</number>
-    </property>
-    <property name="rightMargin">
-     <number>0</number>
-    </property>
-    <property name="bottomMargin">
-     <number>0</number>
-    </property>
+        <widget class="QWidget" name="centralwidget">
+            <property name="styleSheet">
+                <string notr="true">QWidget#centralwidget { background: transparent; }</string>
+            </property>
 
-    <item>
-     <widget class="QWidget" name="leftPanel">
-      <property name="minimumSize">
-       <size>
-        <width>280</width>
-        <height>0</height>
-       </size>
-      </property>
-      <property name="maximumSize">
-       <size>
-        <width>280</width>
-        <height>16777215</height>
-       </size>
-      </property>
-      <property name="styleSheet">
-       <string notr="true">
-        QWidget#leftPanel {
-            background-color: rgba(22, 22, 34, 0.95);
-            border-right: 2px solid rgba(100, 149, 237, 0.3);
-        }
-        QPushButton {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);
-            color: white;
-            border: none;
-            border-radius: 12px;
-            padding: 18px;
-            font-size: 13px;
-            font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-        QPushButton:hover {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #764ba2, stop:1 #667eea);
-            transform: scale(1.02);
-        }
-        QPushButton:pressed {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #5a4a8a, stop:1 #556cd6);
-        }
-        QPushButton#pushButton {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #56CCF2, stop:1 #2F80ED);
-        }
-        QPushButton#pushButton_2 {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #11998e, stop:1 #38ef7d);
-        }
-        QPushButton#pushButton_3 {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f093fb, stop:1 #f5576c);
-        }
-        QLabel#infoBox {
-            background: rgba(30, 30, 46, 0.8);
-            border: 1px solid rgba(100, 149, 237, 0.3);
-            border-radius: 12px;
-            padding: 16px;
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 12px;
-            line-height: 1.6;
-        }
-       </string>
-      </property>
-      
-      <layout class="QVBoxLayout" name="leftLayout">
-       <property name="spacing">
-        <number>16</number>
-       </property>
-       <property name="leftMargin">
-        <number>20</number>
-       </property>
-       <property name="topMargin">
-        <number>24</number>
-       </property>
-       <property name="rightMargin">
-        <number>20</number>
-       </property>
-       <property name="bottomMargin">
-        <number>24</number>
-       </property>
+            <layout class="QHBoxLayout" name="mainLayout">
+                <property name="spacing">
+                    <number>0</number>
+                </property>
+                <property name="leftMargin">
+                    <number>0</number>
+                </property>
+                <property name="topMargin">
+                    <number>0</number>
+                </property>
+                <property name="rightMargin">
+                    <number>0</number>
+                </property>
+                <property name="bottomMargin">
+                    <number>0</number>
+                </property>
 
-       <item>
-        <widget class="QLabel" name="titleLabel">
-         <property name="text">
-          <string>CT PROCESSOR</string>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignCenter</set>
-         </property>
-         <property name="styleSheet">
-          <string notr="true">
-           QLabel {
-               color: white;
-               font-size: 18px;
-               font-weight: 700;
-               letter-spacing: 2px;
-               padding: 16px;
-               background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 rgba(102, 126, 234, 0.2), stop:1 rgba(118, 75, 162, 0.2));
-               border-radius: 12px;
-               border: 1px solid rgba(100, 149, 237, 0.3);
-           }
-          </string>
-         </property>
+                <item>
+                    <widget class="QWidget" name="leftPanel">
+                        <property name="minimumSize">
+                            <size>
+                                <width>280</width>
+                                <height>0</height>
+                            </size>
+                        </property>
+                        <property name="maximumSize">
+                            <size>
+                                <width>280</width>
+                                <height>16777215</height>
+                            </size>
+                        </property>
+                        <property name="styleSheet">
+                            <string notr="true">
+                                QWidget#leftPanel {
+                                background-color: rgba(22, 22, 34, 0.95);
+                                border-right: 2px solid rgba(100, 149, 237, 0.3);
+                                }
+                                QPushButton {
+                                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea,
+                                stop:1 #764ba2);
+                                color: white;
+                                border: none;
+                                border-radius: 12px;
+                                padding: 18px;
+                                font-size: 13px;
+                                font-weight: 600;
+                                letter-spacing: 0.5px;
+                                }
+                                QPushButton:hover {
+                                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #764ba2,
+                                stop:1 #667eea);
+                                transform: scale(1.02);
+                                }
+                                QPushButton:pressed {
+                                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #5a4a8a,
+                                stop:1 #556cd6);
+                                }
+                                QPushButton#pushButton {
+                                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #56CCF2,
+                                stop:1 #2F80ED);
+                                }
+                                QPushButton#pushButton_2 {
+                                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #11998e,
+                                stop:1 #38ef7d);
+                                }
+                                QPushButton#pushButton_3 {
+                                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #f093fb,
+                                stop:1 #f5576c);
+                                }
+                                QLabel#infoBox {
+                                background: rgba(30, 30, 46, 0.8);
+                                border: 1px solid rgba(100, 149, 237, 0.3);
+                                border-radius: 12px;
+                                padding: 16px;
+                                color: rgba(255, 255, 255, 0.85);
+                                font-size: 12px;
+                                line-height: 1.6;
+                                }
+                            </string>
+                        </property>
+
+                        <layout class="QVBoxLayout" name="leftLayout">
+                            <property name="spacing">
+                                <number>16</number>
+                            </property>
+                            <property name="leftMargin">
+                                <number>20</number>
+                            </property>
+                            <property name="topMargin">
+                                <number>24</number>
+                            </property>
+                            <property name="rightMargin">
+                                <number>20</number>
+                            </property>
+                            <property name="bottomMargin">
+                                <number>24</number>
+                            </property>
+
+                            <item>
+                                <widget class="QLabel" name="titleLabel">
+                                    <property name="text">
+                                        <string>CT PROCESSOR</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
+                                    </property>
+                                    <property name="styleSheet">
+                                        <string notr="true">
+                                            QLabel {
+                                            color: white;
+                                            font-size: 18px;
+                                            font-weight: 700;
+                                            letter-spacing: 2px;
+                                            padding: 16px;
+                                            background: qlineargradient(x1:0, y1:0, x2:1, y2:0,
+                                            stop:0 rgba(102, 126, 234, 0.2), stop:1 rgba(118, 75,
+                                            162, 0.2));
+                                            border-radius: 12px;
+                                            border: 1px solid rgba(100, 149, 237, 0.3);
+                                            }
+                                        </string>
+                                    </property>
+                                </widget>
+                            </item>
+
+                            <item>
+                                <spacer name="verticalSpacer_1">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeType">
+                                        <enum>QSizePolicy::Fixed</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+
+                            <item>
+                                <widget class="QPushButton" name="pushButton">
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>0</width>
+                                            <height>52</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>Cargar Imagen CT</string>
+                                    </property>
+                                    <property name="cursor">
+                                        <cursorShape>PointingHandCursor</cursorShape>
+                                    </property>
+                                </widget>
+                            </item>
+
+                            <item>
+                                <widget class="QLabel" name="infoBox">
+                                    <property name="text">
+                                        <string>&lt;b style='color: #667eea;'&gt;Red Neuronal
+                                            DnCNN&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Modelo
+                                            pre-entrenado para reducción de ruido en imágenes
+                                            médicas.&lt;br/&gt;&lt;br/&gt;• Arquitectura: 20
+                                            capas&lt;br/&gt;• Dataset: BSD68 + Medical&lt;br/&gt;•
+                                            Ruido: Adaptativo</string>
+                                    </property>
+                                    <property name="wordWrap">
+                                        <bool>true</bool>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignLeft|Qt::AlignTop</set>
+                                    </property>
+                                </widget>
+                            </item>
+
+                            <item>
+                                <spacer name="verticalSpacer_2">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>40</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+                            <item>
+                                <widget class="QLabel" name="label_RAM">
+                                    <property name="text">
+                                        <string>RAM</string>
+                                    </property>
+                                    <property name="alignment">
+                                        <set>Qt::AlignCenter</set>
+                                    </property>
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>80</width>
+                                            <height>80</height>
+                                        </size>
+                                    </property>
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>12</pointsize>
+                                            <weight>75</weight>
+                                            <bold>true</bold>
+                                        </font>
+                                    </property>
+                                    <property name="styleSheet">
+                                        <string>QLabel {
+                                            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                            stop:0 #4A90E2, stop:1 #357ABD);
+                                            color: white;
+                                            border-radius: 10px;
+                                            border: 2px solid #2E5C8A;
+                                            padding: 10px;
+                                            }
+
+                                            QLabel:hover {
+                                            background: qlineargradient(x1:0, y1:0, x2:0, y2:1,
+                                            stop:0 #5AA3F5, stop:1 #4A90E2);
+                                            border: 2px solid #4A90E2;
+                                            }</string>
+                                    </property>
+                                </widget>
+                            </item>
+                            <item>
+                                <widget class="QCheckBox" name="checkBox_dncnn_suavizado">
+                                    <property name="text">
+                                        <string>Aplicar imagen suavizada con DnCNN</string>
+                                    </property>
+                                    <property name="checked">
+                                        <bool>false</bool>
+                                    </property>
+                                    <property name="font">
+                                        <font>
+                                            <pointsize>10</pointsize>
+                                            <weight>75</weight>
+                                            <bold>true</bold>
+                                        </font>
+                                    </property>
+                                    <property name="styleSheet">
+                                        <string notr="true">QCheckBox {
+                                            color: white;
+                                            spacing: 8px;
+                                            }
+
+                                            QCheckBox::indicator {
+                                            width: 10px;
+                                            height: 10px;
+                                            border-radius: 4px;
+                                            border: 2px solid #4A90E2;
+                                            background-color: #E8F4FF;
+                                            }
+
+                                            QCheckBox::indicator:hover {
+                                            border: 2px solid #5AA3F5;
+                                            background-color: #F0F8FF;
+                                            }
+
+                                            QCheckBox::indicator:checked {
+                                            background-color: #4A90E2;
+                                            border: 2px solid #357ABD;
+                                            image: url(:/icons/check.png);
+                                            }
+
+                                            QCheckBox::indicator:checked:hover {
+                                            background-color: #5AA3F5;
+                                            }</string>
+                                    </property>
+                                </widget>
+                            </item>
+
+                            <item>
+                                <widget class="QPushButton" name="pushButton_2">
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>0</width>
+                                            <height>52</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>Ver Pipeline Completo</string>
+                                    </property>
+                                    <property name="cursor">
+                                        <cursorShape>PointingHandCursor</cursorShape>
+                                    </property>
+                                </widget>
+                            </item>
+
+                            <item>
+                                <widget class="QPushButton" name="pushButton_3">
+                                    <property name="minimumSize">
+                                        <size>
+                                            <width>0</width>
+                                            <height>52</height>
+                                        </size>
+                                    </property>
+                                    <property name="text">
+                                        <string>Aplicar Red Neuronal</string>
+                                    </property>
+                                    <property name="cursor">
+                                        <cursorShape>PointingHandCursor</cursorShape>
+                                    </property>
+                                </widget>
+                            </item>
+
+                            <item>
+                                <spacer name="verticalSpacer_3">
+                                    <property name="orientation">
+                                        <enum>Qt::Vertical</enum>
+                                    </property>
+                                    <property name="sizeHint" stdset="0">
+                                        <size>
+                                            <width>20</width>
+                                            <height>20</height>
+                                        </size>
+                                    </property>
+                                </spacer>
+                            </item>
+
+                        </layout>
+                    </widget>
+                </item>
+
+                <item>
+                    <widget class="QWidget" name="rightPanel">
+                        <property name="styleSheet">
+                            <string notr="true">
+                                QWidget#rightPanel { background: transparent; }
+                                QLabel[frameShape="4"] {
+                                background: rgba(30, 30, 46, 0.6);
+                                border: 2px solid rgba(100, 149, 237, 0.2);
+                                border-radius: 16px;
+                                padding: 12px;
+                                color: rgba(255, 255, 255, 0.85);
+                                font-size: 13px;
+                                font-weight: 600;
+                                }
+                                QLabel[frameShape="4"]:hover {
+                                border-color: rgba(100, 149, 237, 0.5);
+                                background: rgba(30, 30, 46, 0.8);
+                                }
+                                QSlider::groove:horizontal {
+                                height: 6px;
+                                background: rgba(50, 50, 70, 0.6);
+                                border-radius: 3px;
+                                }
+                                QSlider::handle:horizontal {
+                                background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #667eea,
+                                stop:1 #764ba2);
+                                border: 2px solid rgba(255, 255, 255, 0.2);
+                                width: 16px;
+                                height: 16px;
+                                margin: -5px 0;
+                                border-radius: 8px;
+                                }
+                                QSlider::sub-page:horizontal {
+                                background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea,
+                                stop:1 #764ba2);
+                                border-radius: 3px;
+                                }
+                            </string>
+                        </property>
+
+                        <layout class="QVBoxLayout" name="rightLayout">
+                            <property name="spacing">
+                                <number>24</number>
+                            </property>
+                            <property name="leftMargin">
+                                <number>24</number>
+                            </property>
+                            <property name="topMargin">
+                                <number>24</number>
+                            </property>
+                            <property name="rightMargin">
+                                <number>24</number>
+                            </property>
+                            <property name="bottomMargin">
+                                <number>24</number>
+                            </property>
+
+                            <item>
+                                <widget class="QWidget" name="imageGroupWidget">
+                                    <layout class="QGridLayout" name="imageGrid">
+                                        <property name="spacing">
+                                            <number>20</number>
+                                        </property>
+
+                                        <item row="0" column="0">
+                                            <layout class="QVBoxLayout" name="column0_top">
+                                                <property name="spacing">
+                                                    <number>12</number>
+                                                </property>
+                                                <item>
+                                                    <widget class="QLabel" name="titleImage1">
+                                                        <property name="text">
+                                                            <string>IMAGEN SUAVIZADA (RED NEURONAL)</string>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">color: rgba(255,
+                                                                255, 255, 0.9); font-size: 12px;
+                                                                font-weight: 700; letter-spacing:
+                                                                1px;</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QLabel" name="label_4">
+                                                        <property name="text">
+                                                            <string>Imagen suavizada – Red Neuronal</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                        <property name="frameShape">
+                                                            <enum>QFrame::Box</enum>
+                                                        </property>
+                                                        <property name="minimumSize">
+                                                            <size>
+                                                                <width>380</width>
+                                                                <height>380</height>
+                                                            </size>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                            </layout>
+                                        </item>
+
+                                        <item row="0" column="1">
+                                            <layout class="QVBoxLayout" name="column1_top">
+                                                <property name="spacing">
+                                                    <number>12</number>
+                                                </property>
+                                                <item>
+                                                    <widget class="QLabel" name="titleImage2">
+                                                        <property name="text">
+                                                            <string>IMAGEN SUAVIZADA (OPENCV)</string>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">color: #f093fb;
+                                                                font-size: 12px; font-weight: 700;
+                                                                letter-spacing: 1px;</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QLabel" name="label_5">
+                                                        <property name="text">
+                                                            <string>Imagen suavizada (OpenCV)</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                        <property name="frameShape">
+                                                            <enum>QFrame::Box</enum>
+                                                        </property>
+                                                        <property name="minimumSize">
+                                                            <size>
+                                                                <width>380</width>
+                                                                <height>380</height>
+                                                            </size>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                            </layout>
+                                        </item>
+
+                                        <item row="0" column="2">
+                                            <layout class="QVBoxLayout" name="column2_top">
+                                                <property name="spacing">
+                                                    <number>12</number>
+                                                </property>
+                                                <item>
+                                                    <widget class="QLabel" name="titleImage3">
+                                                        <property name="text">
+                                                            <string>IMAGEN RESULTANTE</string>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">color: #f093fb;
+                                                                font-size: 12px; font-weight: 700;
+                                                                letter-spacing: 1px;</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QLabel" name="label_6">
+                                                        <property name="text">
+                                                            <string>Resultado Final</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                        <property name="frameShape">
+                                                            <enum>QFrame::Box</enum>
+                                                        </property>
+                                                        <property name="minimumSize">
+                                                            <size>
+                                                                <width>380</width>
+                                                                <height>380</height>
+                                                            </size>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                            </layout>
+                                        </item>
+
+                                        <item row="1" column="0" colspan="3">
+                                            <spacer name="horizontalSpacer_separator">
+                                                <property name="orientation">
+                                                    <enum>Qt::Vertical</enum>
+                                                </property>
+                                                <property name="sizeType">
+                                                    <enum>QSizePolicy::Fixed</enum>
+                                                </property>
+                                                <property name="sizeHint" stdset="0">
+                                                    <size>
+                                                        <width>20</width>
+                                                        <height>30</height>
+                                                    </size>
+                                                </property>
+                                            </spacer>
+                                        </item>
+
+                                        <item row="2" column="0">
+                                            <layout class="QVBoxLayout" name="column0_bottom">
+                                                <property name="spacing">
+                                                    <number>12</number>
+                                                </property>
+                                                <item>
+                                                    <widget class="QLabel" name="titleResult1">
+                                                        <property name="text">
+                                                            <string>HUESOS</string>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">color: rgba(255,
+                                                                255, 255, 0.9); font-size: 12px;
+                                                                font-weight: 700; letter-spacing:
+                                                                1px;</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QLabel" name="label">
+                                                        <property name="text">
+                                                            <string>Resultado Huesos</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                        <property name="frameShape">
+                                                            <enum>QFrame::Box</enum>
+                                                        </property>
+                                                        <property name="minimumSize">
+                                                            <size>
+                                                                <width>380</width>
+                                                                <height>380</height>
+                                                            </size>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                            </layout>
+                                        </item>
+
+                                        <item row="2" column="1">
+                                            <layout class="QVBoxLayout" name="column1_bottom">
+                                                <property name="spacing">
+                                                    <number>12</number>
+                                                </property>
+                                                <item>
+                                                    <widget class="QLabel" name="titleResult2">
+                                                        <property name="text">
+                                                            <string>MUSCULOS</string>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">color: #f093fb;
+                                                                font-size: 12px; font-weight: 700;
+                                                                letter-spacing: 1px;</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QLabel" name="label_3">
+                                                        <property name="text">
+                                                            <string>Resultado Músculos</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                        <property name="frameShape">
+                                                            <enum>QFrame::Box</enum>
+                                                        </property>
+                                                        <property name="minimumSize">
+                                                            <size>
+                                                                <width>380</width>
+                                                                <height>380</height>
+                                                            </size>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                            </layout>
+                                        </item>
+
+                                        <item row="2" column="2">
+                                            <layout class="QVBoxLayout" name="column2_bottom">
+                                                <property name="spacing">
+                                                    <number>12</number>
+                                                </property>
+                                                <item>
+                                                    <widget class="QLabel" name="titleResult3">
+                                                        <property name="text">
+                                                            <string>PULMON / MASCARA</string>
+                                                        </property>
+                                                        <property name="styleSheet">
+                                                            <string notr="true">color: rgba(255,
+                                                                255, 255, 0.9); font-size: 12px;
+                                                                font-weight: 700; letter-spacing:
+                                                                1px;</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                                <item>
+                                                    <widget class="QLabel" name="label_2">
+                                                        <property name="text">
+                                                            <string>Máscara de segmentación</string>
+                                                        </property>
+                                                        <property name="alignment">
+                                                            <set>Qt::AlignCenter</set>
+                                                        </property>
+                                                        <property name="frameShape">
+                                                            <enum>QFrame::Box</enum>
+                                                        </property>
+                                                        <property name="minimumSize">
+                                                            <size>
+                                                                <width>380</width>
+                                                                <height>380</height>
+                                                            </size>
+                                                        </property>
+                                                    </widget>
+                                                </item>
+                                            </layout>
+                                        </item>
+
+                                    </layout>
+                                </widget>
+                            </item>
+
+                            <item>
+                                <layout class="QHBoxLayout" name="controlsRow">
+                                    <property name="spacing">
+                                        <number>20</number>
+                                    </property>
+
+                                    <item>
+                                        <layout class="QVBoxLayout" name="controls1">
+                                            <property name="spacing">
+                                                <number>8</number>
+                                            </property>
+
+                                            <item>
+                                                <widget class="QLabel" name="labelSlider1">
+                                                    <property name="text">
+                                                        <string>Intensidad de Hueso</string>
+                                                    </property>
+                                                    <property name="styleSheet">
+                                                        <string notr="true">color: rgba(255, 255,
+                                                            255, 0.8); font-size: 11px; font-weight:
+                                                            600;</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QSlider" name="horizontalSlider">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                    <property name="cursor">
+                                                        <cursorShape>PointingHandCursor</cursorShape>
+                                                    </property>
+                                                </widget>
+                                            </item>
+
+                                            <item>
+                                                <widget class="QLabel" name="labelSlider2">
+                                                    <property name="text">
+                                                        <string>Reducción de Ruido</string>
+                                                    </property>
+                                                    <property name="styleSheet">
+                                                        <string notr="true">color: rgba(255, 255,
+                                                            255, 0.8); font-size: 11px; font-weight:
+                                                            600;</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QSlider" name="horizontalSlider_2">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                    <property name="cursor">
+                                                        <cursorShape>PointingHandCursor</cursorShape>
+                                                    </property>
+                                                </widget>
+                                            </item>
+
+                                            <item>
+                                                <widget class="QLabel" name="labelSlider3">
+                                                    <property name="text">
+                                                        <string>Suavizado</string>
+                                                    </property>
+                                                    <property name="styleSheet">
+                                                        <string notr="true">color: rgba(255, 255,
+                                                            255, 0.8); font-size: 11px; font-weight:
+                                                            600;</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QSlider" name="horizontalSlider_3">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                    <property name="cursor">
+                                                        <cursorShape>PointingHandCursor</cursorShape>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                        </layout>
+                                    </item>
+
+                                    <item>
+                                        <layout class="QVBoxLayout" name="controls2">
+                                            <property name="spacing">
+                                                <number>8</number>
+                                            </property>
+
+                                            <item>
+                                                <widget class="QLabel" name="labelSlider4">
+                                                    <property name="text">
+                                                        <string>Nivel de Umbral</string>
+                                                    </property>
+                                                    <property name="styleSheet">
+                                                        <string notr="true">color: rgba(255, 255,
+                                                            255, 0.8); font-size: 11px; font-weight:
+                                                            600;</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QSlider" name="horizontalSlider_4">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                    <property name="cursor">
+                                                        <cursorShape>PointingHandCursor</cursorShape>
+                                                    </property>
+                                                </widget>
+                                            </item>
+
+                                            <item>
+                                                <widget class="QLabel" name="labelSlider5">
+                                                    <property name="text">
+                                                        <string>Kernel Morfológico</string>
+                                                    </property>
+                                                    <property name="styleSheet">
+                                                        <string notr="true">color: rgba(255, 255,
+                                                            255, 0.8); font-size: 11px; font-weight:
+                                                            600;</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QSlider" name="horizontalSlider_5">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                    <property name="cursor">
+                                                        <cursorShape>PointingHandCursor</cursorShape>
+                                                    </property>
+                                                </widget>
+                                            </item>
+
+                                            <item>
+                                                <widget class="QLabel" name="labelSlider6">
+                                                    <property name="text">
+                                                        <string>Contraste CLAHE</string>
+                                                    </property>
+                                                    <property name="styleSheet">
+                                                        <string notr="true">color: rgba(255, 255,
+                                                            255, 0.8); font-size: 11px; font-weight:
+                                                            600;</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QSlider" name="horizontalSlider_6">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                    <property name="cursor">
+                                                        <cursorShape>PointingHandCursor</cursorShape>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                        </layout>
+                                    </item>
+
+                                    <item>
+                                        <layout class="QVBoxLayout" name="controls3">
+                                            <property name="spacing">
+                                                <number>8</number>
+                                            </property>
+
+                                            <item>
+                                                <widget class="QLabel" name="labelSlider7">
+                                                    <property name="text">
+                                                        <string>Rango Mínimo</string>
+                                                    </property>
+                                                    <property name="styleSheet">
+                                                        <string notr="true">color: rgba(255, 255,
+                                                            255, 0.8); font-size: 11px; font-weight:
+                                                            600;</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QSlider" name="horizontalSlider_7">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                    <property name="minimum">
+                                                        <number>0</number>
+                                                    </property>
+                                                    <property name="maximum">
+                                                        <number>255</number>
+                                                    </property>
+                                                    <property name="value">
+                                                        <number>50</number>
+                                                    </property>
+                                                    <property name="cursor">
+                                                        <cursorShape>PointingHandCursor</cursorShape>
+                                                    </property>
+                                                </widget>
+                                            </item>
+
+                                            <item>
+                                                <widget class="QLabel" name="labelSlider8">
+                                                    <property name="text">
+                                                        <string>Rango Máximo</string>
+                                                    </property>
+                                                    <property name="styleSheet">
+                                                        <string notr="true">color: rgba(255, 255,
+                                                            255, 0.8); font-size: 11px; font-weight:
+                                                            600;</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QSlider" name="horizontalSlider_8">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                    <property name="minimum">
+                                                        <number>0</number>
+                                                    </property>
+                                                    <property name="maximum">
+                                                        <number>255</number>
+                                                    </property>
+                                                    <property name="value">
+                                                        <number>200</number>
+                                                    </property>
+                                                    <property name="cursor">
+                                                        <cursorShape>PointingHandCursor</cursorShape>
+                                                    </property>
+                                                </widget>
+                                            </item>
+
+                                            <item>
+                                                <widget class="QLabel" name="labelSlider9">
+                                                    <property name="text">
+                                                        <string>Erosión</string>
+                                                    </property>
+                                                    <property name="styleSheet">
+                                                        <string notr="true">color: rgba(255, 255,
+                                                            255, 0.8); font-size: 11px; font-weight:
+                                                            600;</string>
+                                                    </property>
+                                                </widget>
+                                            </item>
+                                            <item>
+                                                <widget class="QSlider" name="horizontalSlider_9">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Horizontal</enum>
+                                                    </property>
+                                                    <property name="minimum">
+                                                        <number>1</number>
+                                                    </property>
+                                                    <property name="maximum">
+                                                        <number>15</number>
+                                                    </property>
+                                                    <property name="value">
+                                                        <number>3</number>
+                                                    </property>
+                                                    <property name="cursor">
+                                                        <cursorShape>PointingHandCursor</cursorShape>
+                                                    </property>
+                                                </widget>
+                                            </item>
+
+                                            <item>
+                                                <spacer name="verticalSpacer_align2">
+                                                    <property name="orientation">
+                                                        <enum>Qt::Vertical</enum>
+                                                    </property>
+                                                    <property name="sizeHint" stdset="0">
+                                                        <size>
+                                                            <width>20</width>
+                                                            <height>0</height>
+                                                        </size>
+                                                    </property>
+                                                </spacer>
+                                            </item>
+
+                                        </layout>
+                                    </item>
+
+                                </layout>
+                            </item>
+
+                        </layout>
+                    </widget>
+                </item>
+
+            </layout>
         </widget>
-       </item>
 
-       <item>
-        <spacer name="verticalSpacer_1">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeType">
-          <enum>QSizePolicy::Fixed</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-
-       <item>
-        <widget class="QPushButton" name="pushButton">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>52</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Cargar Imagen CT</string>
-         </property>
-         <property name="cursor">
-          <cursorShape>PointingHandCursor</cursorShape>
-         </property>
+        <widget class="QMenuBar" name="menubar">
+            <property name="geometry">
+                <rect>
+                    <x>0</x>
+                    <y>0</y>
+                    <width>1920</width>
+                    <height>24</height>
+                </rect>
+            </property>
+            <property name="styleSheet">
+                <string notr="true">
+                    QMenuBar {
+                    background-color: rgba(22, 22, 34, 0.95);
+                    color: white;
+                    border-bottom: 1px solid rgba(100, 149, 237, 0.3);
+                    padding: 4px;
+                    }
+                    QMenuBar::item {
+                    padding: 6px 12px;
+                    background: transparent;
+                    border-radius: 4px;
+                    }
+                    QMenuBar::item:selected {
+                    background: rgba(102, 126, 234, 0.3);
+                    }
+                </string>
+            </property>
         </widget>
-       </item>
 
-       <item>
-        <widget class="QLabel" name="infoBox">
-         <property name="text">
-          <string>&lt;b style='color: #667eea;'&gt;Red Neuronal DnCNN&lt;/b&gt;&lt;br/&gt;&lt;br/&gt;Modelo pre-entrenado para reducción de ruido en imágenes médicas.&lt;br/&gt;&lt;br/&gt;• Arquitectura: 20 capas&lt;br/&gt;• Dataset: BSD68 + Medical&lt;br/&gt;• Ruido: Adaptativo</string>
-         </property>
-         <property name="wordWrap">
-          <bool>true</bool>
-         </property>
-         <property name="alignment">
-          <set>Qt::AlignLeft|Qt::AlignTop</set>
-         </property>
+        <widget class="QStatusBar" name="statusbar">
+            <property name="styleSheet">
+                <string notr="true">
+                    QStatusBar {
+                    background: rgba(22, 22, 34, 0.95);
+                    color: rgba(255, 255, 255, 0.7);
+                    border-top: 1px solid rgba(100, 149, 237, 0.3);
+                    padding: 4px 12px;
+                    font-size: 11px;
+                    }
+                </string>
+            </property>
         </widget>
-       </item>
 
-       <item>
-        <spacer name="verticalSpacer_2">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>40</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-        
-       <item>
-        <widget class="QCheckBox" name="checkBox_dncnn_suavizado">
-         <property name="text">
-            <string>Aplicar imagen suavizada con DnCNN</string>
-         </property>
-         <property name="checked">
-            <bool>false</bool>
-         </property>
-         <property name="styleSheet">
-             <string notr="true">color: white; font-weight: bold;</string>
-         </property>
-        </widget>
-       </item>
-
-       <item>
-        <widget class="QPushButton" name="pushButton_2">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>52</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Ver Pipeline Completo</string>
-         </property>
-         <property name="cursor">
-          <cursorShape>PointingHandCursor</cursorShape>
-         </property>
-        </widget>
-       </item>
-
-       <item>
-        <widget class="QPushButton" name="pushButton_3">
-         <property name="minimumSize">
-          <size>
-           <width>0</width>
-           <height>52</height>
-          </size>
-         </property>
-         <property name="text">
-          <string>Aplicar Red Neuronal</string>
-         </property>
-         <property name="cursor">
-          <cursorShape>PointingHandCursor</cursorShape>
-         </property>
-        </widget>
-       </item>
-
-       <item>
-        <spacer name="verticalSpacer_3">
-         <property name="orientation">
-          <enum>Qt::Vertical</enum>
-         </property>
-         <property name="sizeHint" stdset="0">
-          <size>
-           <width>20</width>
-           <height>20</height>
-          </size>
-         </property>
-        </spacer>
-       </item>
-
-      </layout>
-     </widget>
-    </item>
-
-    <item>
-     <widget class="QWidget" name="rightPanel">
-      <property name="styleSheet">
-       <string notr="true">
-        QWidget#rightPanel { background: transparent; }
-        QLabel[frameShape="4"] {
-            background: rgba(30, 30, 46, 0.6);
-            border: 2px solid rgba(100, 149, 237, 0.2);
-            border-radius: 16px;
-            padding: 12px;
-            color: rgba(255, 255, 255, 0.85);
-            font-size: 13px;
-            font-weight: 600;
-        }
-        QLabel[frameShape="4"]:hover {
-            border-color: rgba(100, 149, 237, 0.5);
-            background: rgba(30, 30, 46, 0.8);
-        }
-        QSlider::groove:horizontal {
-            height: 6px;
-            background: rgba(50, 50, 70, 0.6);
-            border-radius: 3px;
-        }
-        QSlider::handle:horizontal {
-            background: qlineargradient(x1:0, y1:0, x2:0, y2:1, stop:0 #667eea, stop:1 #764ba2);
-            border: 2px solid rgba(255, 255, 255, 0.2);
-            width: 16px;
-            height: 16px;
-            margin: -5px 0;
-            border-radius: 8px;
-        }
-        QSlider::sub-page:horizontal {
-            background: qlineargradient(x1:0, y1:0, x2:1, y2:0, stop:0 #667eea, stop:1 #764ba2);
-            border-radius: 3px;
-        }
-       </string>
-      </property>
-      
-      <layout class="QVBoxLayout" name="rightLayout">
-       <property name="spacing">
-        <number>24</number>
-       </property>
-       <property name="leftMargin">
-        <number>24</number>
-       </property>
-       <property name="topMargin">
-        <number>24</number>
-       </property>
-       <property name="rightMargin">
-        <number>24</number>
-       </property>
-       <property name="bottomMargin">
-        <number>24</number>
-       </property>
-
-       <item>
-        <widget class="QWidget" name="imageGroupWidget">
-         <layout class="QGridLayout" name="imageGrid">
-          <property name="spacing">
-           <number>20</number>
-          </property>
-
-          <item row="0" column="0">
-           <layout class="QVBoxLayout" name="column0_top">
-            <property name="spacing">
-             <number>12</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="titleImage1">
-              <property name="text">
-               <string>IMAGEN SUAVIZADA (RED NEURONAL)</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgba(255, 255, 255, 0.9); font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_4">
-              <property name="text">
-               <string>Imagen suavizada – Red Neuronal</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>380</width>
-                <height>380</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-
-          <item row="0" column="1">
-           <layout class="QVBoxLayout" name="column1_top">
-            <property name="spacing">
-             <number>12</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="titleImage2">
-              <property name="text">
-               <string>IMAGEN SUAVIZADA (OPENCV)</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: #f093fb; font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_5">
-              <property name="text">
-               <string>Imagen suavizada (OpenCV)</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>380</width>
-                <height>380</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-
-          <item row="0" column="2">
-           <layout class="QVBoxLayout" name="column2_top">
-            <property name="spacing">
-             <number>12</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="titleImage3">
-              <property name="text">
-               <string>IMAGEN RESULTANTE</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: #f093fb; font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_6">
-              <property name="text">
-               <string>Resultado Final</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>380</width>
-                <height>380</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-
-          <item row="1" column="0" colspan="3">
-           <spacer name="horizontalSpacer_separator">
-            <property name="orientation">
-             <enum>Qt::Vertical</enum>
-            </property>
-            <property name="sizeType">
-             <enum>QSizePolicy::Fixed</enum>
-            </property>
-            <property name="sizeHint" stdset="0">
-             <size>
-              <width>20</width>
-              <height>30</height>
-             </size>
-            </property>
-           </spacer>
-          </item>
-
-          <item row="2" column="0">
-           <layout class="QVBoxLayout" name="column0_bottom">
-            <property name="spacing">
-             <number>12</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="titleResult1">
-              <property name="text">
-               <string>HUESOS</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgba(255, 255, 255, 0.9); font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label">
-              <property name="text">
-               <string>Resultado Huesos</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>380</width>
-                <height>380</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-
-          <item row="2" column="1">
-           <layout class="QVBoxLayout" name="column1_bottom">
-            <property name="spacing">
-             <number>12</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="titleResult2">
-              <property name="text">
-               <string>MUSCULOS</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: #f093fb; font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_3">
-              <property name="text">
-               <string>Resultado Músculos</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>380</width>
-                <height>380</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-
-          <item row="2" column="2">
-           <layout class="QVBoxLayout" name="column2_bottom">
-            <property name="spacing">
-             <number>12</number>
-            </property>
-            <item>
-             <widget class="QLabel" name="titleResult3">
-              <property name="text">
-               <string>PULMON / MASCARA</string>
-              </property>
-              <property name="styleSheet">
-               <string notr="true">color: rgba(255, 255, 255, 0.9); font-size: 12px; font-weight: 700; letter-spacing: 1px;</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-             </widget>
-            </item>
-            <item>
-             <widget class="QLabel" name="label_2">
-              <property name="text">
-               <string>Máscara de segmentación</string>
-              </property>
-              <property name="alignment">
-               <set>Qt::AlignCenter</set>
-              </property>
-              <property name="frameShape">
-               <enum>QFrame::Box</enum>
-              </property>
-              <property name="minimumSize">
-               <size>
-                <width>380</width>
-                <height>380</height>
-               </size>
-              </property>
-             </widget>
-            </item>
-           </layout>
-          </item>
-
-         </layout>
-        </widget>
-       </item>
-
-       <item>
-        <layout class="QHBoxLayout" name="controlsRow">
-         <property name="spacing">
-          <number>20</number>
-         </property>
-
-         <item>
-          <layout class="QVBoxLayout" name="controls1">
-           <property name="spacing">
-            <number>8</number>
-           </property>
-           
-           <item>
-            <widget class="QLabel" name="labelSlider1">
-             <property name="text">
-              <string>Intensidad de Hueso</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="horizontalSlider">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-            </widget>
-           </item>
-
-           <item>
-            <widget class="QLabel" name="labelSlider2">
-             <property name="text">
-              <string>Reducción de Ruido</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="horizontalSlider_2">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-            </widget>
-           </item>
-
-           <item>
-            <widget class="QLabel" name="labelSlider3">
-             <property name="text">
-              <string>Suavizado</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="horizontalSlider_3">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-
-         <item>
-          <layout class="QVBoxLayout" name="controls2">
-           <property name="spacing">
-            <number>8</number>
-           </property>
-           
-           <item>
-            <widget class="QLabel" name="labelSlider4">
-             <property name="text">
-              <string>Nivel de Umbral</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="horizontalSlider_4">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-            </widget>
-           </item>
-
-           <item>
-            <widget class="QLabel" name="labelSlider5">
-             <property name="text">
-              <string>Kernel Morfológico</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="horizontalSlider_5">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-            </widget>
-           </item>
-
-           <item>
-            <widget class="QLabel" name="labelSlider6">
-             <property name="text">
-              <string>Contraste CLAHE</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="horizontalSlider_6">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-            </widget>
-           </item>
-          </layout>
-         </item>
-         
-         <item>
-          <layout class="QVBoxLayout" name="controls3">
-           <property name="spacing">
-            <number>8</number>
-           </property>
-           
-           <item>
-            <widget class="QLabel" name="labelSlider7">
-             <property name="text">
-              <string>Rango Mínimo</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="horizontalSlider_7">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="minimum">
-              <number>0</number>
-             </property>
-             <property name="maximum">
-              <number>255</number>
-             </property>
-             <property name="value">
-              <number>50</number>
-             </property>
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-            </widget>
-           </item>
-
-           <item>
-            <widget class="QLabel" name="labelSlider8">
-             <property name="text">
-              <string>Rango Máximo</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="horizontalSlider_8">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="minimum">
-              <number>0</number>
-             </property>
-             <property name="maximum">
-              <number>255</number>
-             </property>
-             <property name="value">
-              <number>200</number>
-             </property>
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-            </widget>
-           </item>
-
-           <item>
-            <widget class="QLabel" name="labelSlider9">
-             <property name="text">
-              <string>Erosión</string>
-             </property>
-             <property name="styleSheet">
-              <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
-             </property>
-            </widget>
-           </item>
-           <item>
-            <widget class="QSlider" name="horizontalSlider_9">
-             <property name="orientation">
-              <enum>Qt::Horizontal</enum>
-             </property>
-             <property name="minimum">
-              <number>1</number>
-             </property>
-             <property name="maximum">
-              <number>15</number>
-             </property>
-             <property name="value">
-              <number>3</number>
-             </property>
-             <property name="cursor">
-              <cursorShape>PointingHandCursor</cursorShape>
-             </property>
-            </widget>
-           </item>
-           
-           <item>
-            <spacer name="verticalSpacer_align2">
-             <property name="orientation">
-              <enum>Qt::Vertical</enum>
-             </property>
-             <property name="sizeHint" stdset="0">
-              <size>
-               <width>20</width>
-               <height>0</height>
-              </size>
-             </property>
-            </spacer>
-           </item>
-
-          </layout>
-         </item>
-
-        </layout>
-       </item>
-
-      </layout>
-     </widget>
-    </item>
-
-   </layout>
-  </widget>
-
-  <widget class="QMenuBar" name="menubar">
-   <property name="geometry">
-    <rect>
-     <x>0</x>
-     <y>0</y>
-     <width>1920</width>
-     <height>24</height>
-    </rect>
-   </property>
-   <property name="styleSheet">
-    <string notr="true">
-     QMenuBar {
-         background-color: rgba(22, 22, 34, 0.95);
-         color: white;
-         border-bottom: 1px solid rgba(100, 149, 237, 0.3);
-         padding: 4px;
-     }
-     QMenuBar::item {
-         padding: 6px 12px;
-         background: transparent;
-         border-radius: 4px;
-     }
-     QMenuBar::item:selected {
-         background: rgba(102, 126, 234, 0.3);
-     }
-    </string>
-   </property>
-  </widget>
-
-  <widget class="QStatusBar" name="statusbar">
-   <property name="styleSheet">
-    <string notr="true">
-     QStatusBar {
-         background: rgba(22, 22, 34, 0.95);
-         color: rgba(255, 255, 255, 0.7);
-         border-top: 1px solid rgba(100, 149, 237, 0.3);
-         padding: 4px 12px;
-         font-size: 11px;
-     }
-    </string>
-   </property>
-  </widget>
-
- </widget>
- <resources/>
- <connections/>
+    </widget>
+    <resources />
+    <connections />
 </ui>

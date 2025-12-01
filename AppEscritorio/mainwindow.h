@@ -35,6 +35,7 @@ private slots:
     void on_pushButton_3_clicked();     // Aplicar Red Neuronal DnCNN
     void updateImageByCheckbox();
     void updateFilters();               // Actualizar sliders en tiempo real
+    double getCurrentRAMUsageMB();
 
 private:
     Ui::MainWindow *ui;

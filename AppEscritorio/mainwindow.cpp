@@ -1,6 +1,9 @@
 #include "mainwindow.h"
 #include "./ui_mainwindow.h"
 #include "pipelinedialog.h"
+#include <QTimer>
+#include <fstream>
+#include <unistd.h>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -9,7 +12,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     processor = new CTImageProcessor("output");  
     procesado = new ImageProcessor();
-    
+
+    QTimer *ramTimer = new QTimer(this);
+    connect(ramTimer, &QTimer::timeout, this, [this]() {
+        double ramMB = getCurrentRAMUsageMB();
+        ui->label_RAM->setText(QString("RAM usada: %1 MB").arg(ramMB, 0, 'f', 1));
+    });
+
+    ramTimer->start(1000);   // actualizar cada 1 segundo
     // Configurar rangos de sliders
     ui->horizontalSlider->setRange(100, 255);      
     ui->horizontalSlider->setValue(170);
@@ -686,3 +696,21 @@ void MainWindow::showImage(const cv::Mat &img)
         )
     );
 }
+
+
+double MainWindow::getCurrentRAMUsageMB()
+{
+    std::ifstream statm("/proc/self/statm");
+    long size = 0;
+    long resident = 0;
+
+    statm >> size >> resident;
+    statm.close();
+
+    long page_size_kb = sysconf(_SC_PAGE_SIZE) / 1024;
+
+    double ramMB = (resident * page_size_kb) / 1024.0;
+    return ramMB;
+}
+
+
