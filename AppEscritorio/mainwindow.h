@@ -33,7 +33,7 @@ private slots:
     void on_pushButton_clicked();       // Cargar Imagen
     void on_pushButton_2_clicked();     // Pipeline completo
     void on_pushButton_3_clicked();     // Aplicar Red Neuronal DnCNN
-
+    void updateImageByCheckbox();
     void updateFilters();               // Actualizar sliders en tiempo real
 
 private:
@@ -42,7 +42,10 @@ private:
     ImageProcessor *procesado;          // Procesador de imágenes
     cv::Mat currentImage;               // Imagen original
     cv::Mat pipelineImage;              // Imagen con pipeline interno
-
+    cv::Mat dncnnImage;   // Imagen suavizada con DnCNN
+    bool dncnnApplied = false;
+    cv::Mat originalImage;
+    void showImage(const cv::Mat &img);
     QImage matToQImage(const cv::Mat &mat);
     void applyInternalPipeline();       // Aplica filtros internos automáticamente
 };

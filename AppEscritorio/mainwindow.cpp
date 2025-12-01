@@ -58,6 +58,9 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::updateFilters);
     connect(ui->horizontalSlider_9, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
+    connect(ui->checkBox_dncnn_suavizado, &QCheckBox::stateChanged,
+        this, &MainWindow::updateImageByCheckbox);
+
 }
 
 MainWindow::~MainWindow()
@@ -97,7 +100,6 @@ void MainWindow::on_pushButton_clicked()
           this, "Seleccionar imagen CT", "",
           "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
     
-    //QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
     if(fileName.isEmpty()) return;
 
     if (!processor->loadImage(fileName.toStdString())) {
@@ -108,6 +110,30 @@ void MainWindow::on_pushButton_clicked()
     procesado->loadImage(fileName.toStdString());
     Mat img = procesado->getOriginalImage();
     currentImage = img.clone();  
+
+    if (ui->checkBox_dncnn_suavizado->isChecked()) {
+
+        // Ejecutar la función del botón 3 que usa DnCNN
+        on_pushButton_3_clicked();
+
+        // Guardar imagen obtenida por DnCNN
+        dncnnApplied = true;
+        currentImage = dncnnImage.clone();   // USAR imagen DnCNN para todo
+
+        // Mostrar en label para verificar
+        ui->label->setPixmap(QPixmap::fromImage(matToQImage(dncnnImage)
+                          .scaled(ui->label->width(), ui->label->height(),
+                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+    } 
+    else {
+        dncnnApplied = false;
+    }
+
+    originalImage = img.clone();
+    currentImage = img.clone();
+
+    showImage(originalImage);
+    updateImageByCheckbox();
 
     // Aplicar pipeline interno automáticamente
     applyInternalPipeline();
@@ -260,6 +286,10 @@ void MainWindow::updateFilters()
 
     Mat img = procesado->getOriginalImage();
     // Mat img = procesado->eliminarCamilla(img);
+    bool checkedDnCNN = ui->checkBox_dncnn_suavizado->isChecked();
+    if (checkedDnCNN && dncnnApplied) {
+        img = dncnnImage.clone();   // Usar imagen suavizada
+    }
 
     Mat imgCLAHE = processor->applyCLAHE( procesado->eliminarCamilla(img), 3);
     Mat imgMejoramiento = processor->segmentByIntensity(imgCLAHE, a_h, 255);
@@ -613,4 +643,46 @@ void MainWindow::on_pushButton_3_clicked()
                             "Modelo: DnCNN Gray Blind (pre-entrenado)\n"
                             "Imagen mostrada en panel central\n"
                             "Comparacion guardada en: " + comparisonPath);
+    dncnnImage = denoisedDisplay.clone();
+    dncnnApplied = true;
+
+    updateImageByCheckbox();
+}
+
+void MainWindow::updateImageByCheckbox()
+{
+    // Si no hay imagen cargada, no hacer nada
+    if (originalImage.empty()) {
+        return;
+    }
+
+    if (ui->checkBox_dncnn_suavizado->isChecked()) {
+        // Mostrar imagen DnCNN solo si ya existe
+        if (!dncnnImage.empty()) {
+            showImage(dncnnImage);
+        }
+        else {
+            // Si aún no existe, usar original
+            showImage(originalImage);
+        }
+    }
+    else {
+        showImage(originalImage);
+    }
+}
+
+void MainWindow::showImage(const cv::Mat &img)
+{
+    if (img.empty()) return;
+
+    QImage qimg = matToQImage(img);
+
+    ui->label->setPixmap(
+        QPixmap::fromImage(qimg).scaled(
+            ui->label->width(),
+            ui->label->height(),
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation
+        )
+    );
 }
