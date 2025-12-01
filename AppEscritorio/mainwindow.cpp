@@ -104,11 +104,11 @@ QImage MainWindow::matToQImage(const cv::Mat &mat)
 // ==================== BOTÓN 1: Cargar Imagen ====================
 void MainWindow::on_pushButton_clicked()
 {
-    // QString fileName = QFileDialog::getOpenFileName(
-    //       this, "Seleccionar imagen CT", "",
-    //       "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
+    QString fileName = QFileDialog::getOpenFileName(
+           this, "Seleccionar imagen CT", "",
+           "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
 
-    QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
+    //QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
     
     if(fileName.isEmpty()) return;
 
@@ -452,7 +452,7 @@ void MainWindow::on_pushButton_3_clicked()
     
     // 3. Preparar proceso Python
     QProcess process;
-    QString pythonScript = "/home/justin/Documentos/VISION/ProyectoIntercicloVisionComputer/main.py";
+    QString pythonScript = "/ania/main.py";
     QString outputPath = "output/resultado_denoising.png";
     
     // 4. Mostrar barra de progreso
