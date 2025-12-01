@@ -710,7 +710,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider1">
                                                     <property name="text">
-                                                        <string>Intensidad de Hueso</string>
+                                                        <string>Umbral para Huesos</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -733,7 +733,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider2">
                                                     <property name="text">
-                                                        <string>Reducción de Ruido</string>
+                                                        <string>Tamaño Kernel Mediana</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -756,7 +756,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider3">
                                                     <property name="text">
-                                                        <string>Suavizado</string>
+                                                        <string>Nivel de Denoising</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -787,7 +787,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider4">
                                                     <property name="text">
-                                                        <string>Nivel de Umbral</string>
+                                                        <string>Intensidad mínima</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -810,7 +810,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider5">
                                                     <property name="text">
-                                                        <string>Kernel Morfológico</string>
+                                                        <string>Intensidad máxima</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -844,7 +844,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider7">
                                                     <property name="text">
-                                                        <string>Rango Mínimo</string>
+                                                        <string>Umbral Bajo</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -876,7 +876,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider8">
                                                     <property name="text">
-                                                        <string>Rango Máximo</string>
+                                                        <string>Umbral Alto</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -908,7 +908,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider9">
                                                     <property name="text">
-                                                        <string>Erosión</string>
+                                                        <string>Tamaño de Kernel</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
