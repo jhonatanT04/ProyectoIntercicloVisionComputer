@@ -25,22 +25,22 @@ MainWindow::MainWindow(QWidget *parent)
     ui->horizontalSlider->setValue(170);
 
     ui->horizontalSlider_2->setRange(0, 30);    
-    ui->horizontalSlider_2->setValue(0);
+    ui->horizontalSlider_2->setValue(3);
 
     ui->horizontalSlider_3->setRange(0, 30);   
-    ui->horizontalSlider_3->setValue(0);
+    ui->horizontalSlider_3->setValue(3);
 
 
     ui->horizontalSlider_4->setRange(30, 255);   
-    ui->horizontalSlider_4->setValue(125);
+    ui->horizontalSlider_4->setValue(70);
 
     ui->horizontalSlider_5->setRange(1, 255);   
-    ui->horizontalSlider_5->setValue(5);
+    ui->horizontalSlider_5->setValue(200);
 
     
 
     ui->horizontalSlider_7->setRange(30, 255);   
-    ui->horizontalSlider_7->setValue(125);
+    ui->horizontalSlider_7->setValue(30);
 
     ui->horizontalSlider_8->setRange(1, 255);   
     ui->horizontalSlider_8->setValue(200);
@@ -104,9 +104,11 @@ QImage MainWindow::matToQImage(const cv::Mat &mat)
 // ==================== BOTÓN 1: Cargar Imagen ====================
 void MainWindow::on_pushButton_clicked()
 {
-    QString fileName = QFileDialog::getOpenFileName(
-          this, "Seleccionar imagen CT", "",
-          "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
+    // QString fileName = QFileDialog::getOpenFileName(
+    //       this, "Seleccionar imagen CT", "",
+    //       "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
+
+    QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
     
     if(fileName.isEmpty()) return;
 
@@ -144,122 +146,14 @@ void MainWindow::on_pushButton_clicked()
     updateImageByCheckbox();
 
     // Aplicar pipeline interno automáticamente
-    applyInternalPipeline();
+    // applyInternalPipeline();
 
     // Actualizar sliders en tiempo real
     updateFilters();
 }
 
 // ==================== Pipeline Interno OPTIMIZADO ====================
-void MainWindow::applyInternalPipeline()
-{
-    if (currentImage.empty()) return;
 
-    Mat img = currentImage.clone();
-    Mat processed;
-
-    // ============================================================
-    // ETAPA 1: WINDOW/LEVEL PARA CT
-    // ============================================================
-    processed = procesado->getOriginalImage();
-    
-    // ============================================================
-    // ETAPA 2: MEJORA DE CONTRASTE
-    // ============================================================
-    processed = procesado->normalizeImage(processed);
-    processed = processor->applyCLAHE(processed, 3.0);
-    processed = processor->histogramEqualization(processed);
-    
-    // ============================================================
-    // ETAPA 3: FILTROS DE SUAVIZADO
-    // ============================================================
-    processed = processor->filterNLMeans(processed);
-    processed = processor->filterBilateral(processed, 5);
-    processed = processor->filterGaussian(processed, 3);
-    processed = processor->filterMedian(processed, 3);
-    
-    // ============================================================
-    // ETAPA 4: MORFOLOGÍA
-    // ============================================================
-    processed = processor->morphTopHat(processed, 5);
-    
-    cv::Mat blackhat = processor->morphBlackHat(processed, 5);
-    cv::Mat enhanced;
-    cv::addWeighted(processed, 1.0, blackhat, 0.3, 0, enhanced);
-    processed = enhanced;
-    
-    processed = processor->morphOpening(processed, 3);
-    processed = processor->morphClosing(processed, 5);
-    
-    // ============================================================
-    // ETAPA 5: SEGMENTACIÓN
-    // ============================================================
-    cv::Mat segmented = processor->thresholdOtsu(processed);
-    cv::Mat adaptiveThresh = processor->thresholdAdaptive(processed, 11);
-    
-    segmented = processor->morphOpening(segmented, 3);
-    segmented = processor->morphClosing(segmented, 7);
-    
-    cv::Mat intensitySeg = processor->segmentByIntensity(processed, 100, 200);
-    
-    cv::Mat finalMask;
-    cv::bitwise_or(segmented, intensitySeg, finalMask);
-    
-    // ============================================================
-    // ETAPA 6: DETECCIÓN DE BORDES
-    // ============================================================
-    cv::Mat edges = processor->edgeCanny(processed, 50, 150);
-    
-    // ============================================================
-    // ETAPA 7: VISUALIZACIÓN
-    // ============================================================
-    cv::Mat overlay = processor->createColorOverlay(currentImage, finalMask, 
-                                                     cv::Scalar(0, 255, 0), 0.4);
-    
-    cv::Mat heatmap = processor->createHeatmap(processed);
-    cv::Mat highlighted = processor->highlightRegion(finalMask, currentImage);
-    
-    cv::Mat multiOverlay;
-    cv::cvtColor(currentImage, multiOverlay, cv::COLOR_GRAY2BGR);
-    
-    cv::Mat lowIntensity = processor->segmentByIntensity(processed, 0, 100);
-    cv::Mat blueOverlay = multiOverlay.clone();
-    blueOverlay.setTo(cv::Scalar(255, 0, 0), lowIntensity);
-    cv::addWeighted(multiOverlay, 0.8, blueOverlay, 0.2, 0, multiOverlay);
-    
-    cv::Mat highIntensity = processor->segmentByIntensity(processed, 200, 255);
-    cv::Mat redOverlay = multiOverlay.clone();
-    redOverlay.setTo(cv::Scalar(0, 0, 255), highIntensity);
-    cv::addWeighted(multiOverlay, 0.8, redOverlay, 0.2, 0, multiOverlay);
-    
-    // ============================================================
-    // ETAPA 8: IMAGEN FINAL
-    // ============================================================
-    cv::Mat finalCombined;
-    cv::cvtColor(processed, finalCombined, cv::COLOR_GRAY2BGR);
-    
-    cv::Mat edgeColor;
-    cv::cvtColor(edges, edgeColor, cv::COLOR_GRAY2BGR);
-    edgeColor.setTo(cv::Scalar(0, 255, 0), edges);
-    cv::addWeighted(finalCombined, 0.7, edgeColor, 0.3, 0, finalCombined);
-    
-    pipelineImage = overlay;
-    
-    // ============================================================
-    // MOSTRAR RESULTADOS EN LA INTERFAZ
-    // ============================================================
-    ui->label->setPixmap(QPixmap::fromImage(matToQImage(overlay)
-                        .scaled(ui->label->width(), ui->label->height(), 
-                               Qt::KeepAspectRatio, Qt::SmoothTransformation)));
-    
-    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(finalMask)
-                          .scaled(ui->label_2->width(), ui->label_2->height(), 
-                                 Qt::KeepAspectRatio, Qt::SmoothTransformation)));
-    
-    ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(heatmap)
-                          .scaled(ui->label_3->width(), ui->label_3->height(), 
-                                 Qt::KeepAspectRatio, Qt::SmoothTransformation)));
-}
 
 // ==================== Update Filters (Tiempo Real) ====================
 void MainWindow::updateFilters()
@@ -281,22 +175,22 @@ void MainWindow::updateFilters()
     int a_p = ui->horizontalSlider_7->value();
     int b_p = ui->horizontalSlider_8->value();
     int c_p = std::max(1, ui->horizontalSlider_9->value() | 1);
-
-    int threshValue = ui->horizontalSlider_4->value();
-    int morphSize = std::max(1, ui->horizontalSlider_5->value() | 1);
-
-    cv::Mat filtered = currentImage.clone();
-
     // ============================================================
     // PROCESAMIENTO
     // ============================================================
-    Mat imgSuavizada = procesado->filterMedian(filtered, k_n);
-
     Mat img = procesado->getOriginalImage();
+
+    Mat imgSuavizada = procesado->filterMedian(img, k_n);
+    //Mat imgSuavizada = procesado->filterMedian(img, 5);
+    
+    
     // Mat img = procesado->eliminarCamilla(img);
     bool checkedDnCNN = ui->checkBox_dncnn_suavizado->isChecked();
     if (checkedDnCNN && dncnnApplied) {
         img = dncnnImage.clone();   // Usar imagen suavizada
+    }
+    else{
+        img = imgSuavizada.clone();
     }
 
     Mat imgCLAHE = processor->applyCLAHE( procesado->eliminarCamilla(img), 3);
@@ -304,10 +198,13 @@ void MainWindow::updateFilters()
 
     Mat imgMejSuavizada = processor->filterNLMeans(imgMejoramiento);
     Mat suavizada2 = processor->filterMedian(imgMejSuavizada, b_h);
-    // suavizada2 = processor->morphDilation(suavizada2, k_n);
 
-    Mat pulmones = procesado->deteccionPulmones(procesado->eliminarCamilla(img), a_p,b_p,c_p);
+    //suavizada2 = processor->morphDilation(suavizada2, k_n);
+
+    std::vector<Mat> capasPulmones = procesado->deteccionPulmones(procesado->eliminarCamilla(img), a_p,b_p,c_p);
     
+    Mat pulmones = capasPulmones[2];
+
     // PASO 1: Preprocesamiento - CLAHE para mejorar contraste
     Mat imgCLAHEmus = procesado->applyCLAHE(procesado->eliminarCamilla(img), 3.0);
     
@@ -323,16 +220,14 @@ void MainWindow::updateFilters()
     Mat maskMusculos;
     inRange(imgBlur, Scalar(a_m), Scalar(b_m), maskMusculos);
     
-    
-
     // PASO 5: Aplicar máscara del cuerpo para eliminar exterior
     Mat maskMusculosCuerpo;
     bitwise_and(maskMusculos, maskCuerpo, maskMusculosCuerpo);
     
     // PASO 6: Eliminar estructuras óseas (alta intensidad)
-    Mat maskHuesos = procesado->filterMedian(imgMejoramiento,k_n);
+    // Mat maskHuesos = procesado->filterMedian(imgMejoramiento,k_n);
     Mat maskHuesosInv;
-    bitwise_not(maskHuesos, maskHuesosInv);
+    bitwise_not(imgMejoramiento, maskHuesosInv);
     
     // Quitar huesos de la máscara muscular
     Mat maskMusculosSinHuesos;
@@ -359,9 +254,10 @@ void MainWindow::updateFilters()
     dilate(maskLimpia, maskLimpia, kernel, Point(-1, -1), 1);
     
     // PASO 10: Crear visualización con color (opcional)
-    Mat resultado = processor->createColorOverlay(img, maskLimpia, Scalar(0, 255, 255), 0.6);
+    Mat resultado = processor->createColorOverlay(procesado->getOriginalImage(), maskLimpia, Scalar(0, 255, 255), 0.6);
+    
     Mat resultadoMultiColor = procesado->createMultiColorOverlay(
-        img,                              // Imagen original
+        procesado->getOriginalImage(),                              // Imagen original
         suavizada2,                       // Máscara 1: Huesos
         pulmones,                         // Máscara 2: Pulmones
         maskLimpia,                       // Máscara 3: Músculos
@@ -371,11 +267,11 @@ void MainWindow::updateFilters()
         0.6                              // Transparencia
     );
 
-    ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(img, suavizada2, Scalar(255, 0, 0), 0.6))
+    ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(procesado->getOriginalImage(), suavizada2, Scalar(255, 0, 0), 0.6))
                         .scaled(ui->label->width(), ui->label->height(), 
                                Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
-    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(img, pulmones, Scalar(0, 155, 0), 0.6))
+    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(procesado->getOriginalImage(), pulmones, Scalar(0, 155, 0), 0.6))
                           .scaled(ui->label_2->width(), ui->label_2->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
@@ -400,108 +296,132 @@ void MainWindow::on_pushButton_2_clicked()
         QMessageBox::warning(this, "Error", "Primero cargue una imagen.");
         return;
     }
-
-    cv::Mat img = currentImage.clone();
     std::vector<std::pair<QString, cv::Mat>> stages;
 
-    cv::Mat temp1, temp2;
+    Mat img = procesado->getOriginalImage();
 
-    temp1 = processor->applyWindowLevel(40, 400); 
-    stages.push_back({"1. Window Level (Soft Tissue)", temp1});
-    
-    temp1 = processor->normalize(temp1); 
-    stages.push_back({"2. Normalize", temp1});
-    
-    temp2 = processor->applyCLAHE(temp1, 3.0); 
-    stages.push_back({"3. CLAHE", temp2});
-    
-    temp1 = processor->histogramEqualization(temp2); 
-    stages.push_back({"4. Histogram Equalization", temp1});
-    
-    temp2 = processor->contrastStretching(temp1);
-    stages.push_back({"5. Contrast Stretching", temp2});
+    stages.push_back({"Imagen original", img});
 
-    temp1 = processor->applyNOT(temp2); 
-    stages.push_back({"6. NOT", temp1});
-    
-    cv::Mat mask1 = processor->threshold(temp2, 100);
-    cv::Mat mask2 = processor->threshold(temp2, 150);
-    
-    temp1 = processor->applyAND(mask1, mask2); 
-    stages.push_back({"7. AND", temp1});
-    
-    temp1 = processor->applyOR(mask1, mask2); 
-    stages.push_back({"8. OR", temp1});
-    
-    temp1 = processor->applyXOR(mask1, mask2); 
-    stages.push_back({"9. XOR", temp1});
+    bool checkedDnCNN = ui->checkBox_dncnn_suavizado->isChecked();
 
-    temp1 = temp2.clone();
-    temp2 = processor->edgeCanny(temp1, 50, 120); 
-    stages.push_back({"10. Canny Edge", temp2});
+    if (checkedDnCNN && dncnnApplied) {
+        stages.push_back({"Imagen Suaviazada DnCNN", dncnnImage.clone()});
+    }
     
-    temp2 = processor->edgeSobel(temp1); 
-    stages.push_back({"11. Sobel Edge", temp2});
     
-    temp2 = processor->edgeLaplacian(temp1); 
-    stages.push_back({"12. Laplacian Edge", temp2});
+    int a_h = ui->horizontalSlider->value();
+    int b_h = std::max(1, ui->horizontalSlider_2->value() | 1);
+    int k_n = std::max(1, ui->horizontalSlider_3->value() | 1);
+    
+    int a_m = ui->horizontalSlider_4->value();
+    int b_m = ui->horizontalSlider_5->value();
+    
 
-    temp1 = processor->filterGaussian(temp1, 5); 
-    stages.push_back({"13. Gaussian Filter", temp1});
-    
-    temp1 = processor->filterMedian(temp1, 5); 
-    stages.push_back({"14. Median Filter", temp1});
-    
-    temp1 = processor->filterBilateral(temp1, 9); 
-    stages.push_back({"15. Bilateral Filter", temp1});
-    
-    temp1 = processor->filterMean(temp1, 5); 
-    stages.push_back({"16. Mean Filter", temp1});
-    
-    temp1 = processor->filterNLMeans(temp1); 
-    stages.push_back({"17. NL-Means Denoising", temp1});
 
-    temp2 = processor->thresholdOtsu(temp1);
-    stages.push_back({"18. Threshold Otsu", temp2});
-    
-    temp1 = processor->morphErosion(temp2, 5); 
-    stages.push_back({"19. Erosion", temp1});
-    
-    temp1 = processor->morphDilation(temp2, 5); 
-    stages.push_back({"20. Dilation", temp1});
-    
-    temp1 = processor->morphOpening(temp2, 5); 
-    stages.push_back({"21. Opening", temp1});
-    
-    temp1 = processor->morphClosing(temp2, 5); 
-    stages.push_back({"22. Closing", temp1});
-    
-    temp1 = processor->morphGradient(temp2, 5); 
-    stages.push_back({"23. Morphological Gradient", temp1});
-    
-    temp1 = processor->morphTopHat(img, 15); 
-    stages.push_back({"24. Top Hat", temp1});
-    
-    temp1 = processor->morphBlackHat(img, 15); 
-    stages.push_back({"25. Black Hat", temp1});
+    int a_p = ui->horizontalSlider_7->value();
+    int b_p = ui->horizontalSlider_8->value();
+    int c_p = std::max(1, ui->horizontalSlider_9->value() | 1);
 
-    temp1 = processor->segmentByIntensity(temp2, 100, 200); 
-    stages.push_back({"26. Segment by Intensity", temp1});
-    
-    temp1 = processor->thresholdAdaptive(temp2, 11);
-    stages.push_back({"27. Adaptive Threshold", temp1});
 
-    temp2 = processor->createColorOverlay(img, temp1, cv::Scalar(0, 255, 0), 0.5); 
-    stages.push_back({"28. Green Overlay", temp2});
+    Mat imgSuavizada = procesado->filterMedian(img, k_n);
+    stages.push_back({"Imagen suavizada Filtro mediana", imgSuavizada});
     
-    temp2 = processor->createHeatmap(temp1); 
-    stages.push_back({"29. Heatmap", temp2});
-    
-    temp2 = processor->highlightRegion(temp1, img);
-    stages.push_back({"30. Highlighted Contours", temp2});
+    Mat binariaCamilla;
+    threshold(img, binariaCamilla, 30, 255, THRESH_BINARY);
+    stages.push_back({"Umbralizacion (Camilla)", binariaCamilla});
 
-    pipelineImage = temp2;
-    stages.push_back({"31. FINAL RESULT", pipelineImage});
+    Mat limpia = procesado->morphClosing(binariaCamilla, 10);
+    stages.push_back({"Eliminar ruido", procesado->morphClosing(limpia, 10)});
+
+    std::vector<std::vector<cv::Point>> contours;
+    findContours(limpia.clone(), contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+
+    if (contours.empty()) {
+        std::cout << "No se encontraron contornos" << std::endl;
+        return ;
+    }
+
+    int indiceMax = 0;
+    double areaMax = 0;
+    for (size_t i = 0; i < contours.size(); i++) {
+        double area = contourArea(contours[i]);
+        if (area > areaMax) {
+            areaMax = area;
+            indiceMax = i;
+        }
+    }
+
+    Mat maskCuerpo = Mat::zeros(img.size(), CV_8U);
+    drawContours(maskCuerpo, contours, indiceMax, Scalar(255), -1);
+    stages.push_back({"Contornos Detectados", maskCuerpo});
+
+    Mat maskErosionada = procesado->morphErosion(maskCuerpo, 10);
+    Mat imgSinCamilla = Mat::zeros(img.size(), CV_8U);
+    img.copyTo(imgSinCamilla, maskErosionada);
+
+    stages.push_back({"Imagen sin la camilla", imgSinCamilla});
+
+
+    Mat imgCLAHE = processor->applyCLAHE(imgSinCamilla,3);
+    stages.push_back({"Ecualizacion del Histograma", imgSinCamilla});
+
+    Mat imgHuesosSegmentada =  processor->segmentByIntensity(imgCLAHE, a_h, 255);
+    stages.push_back({"Ecualizacion del Histograma", imgHuesosSegmentada});
+
+    Mat imgMejSuavizadaHuesos = processor->filterNLMeans(imgHuesosSegmentada);
+    Mat segmentoHuesos = processor->filterMedian(imgMejSuavizadaHuesos, b_h);
+
+    stages.push_back({"Resultado de huesos", segmentoHuesos});
+
+    std::vector<Mat> capasPulmones = procesado->deteccionPulmones(procesado->eliminarCamilla(img), a_p,b_p,c_p);
+
+    stages.push_back({"Imagen binaria (Pulmones)", capasPulmones[0]});
+    stages.push_back({"Closthig", capasPulmones[1]});
+    stages.push_back({"Resultado de Pulmones", capasPulmones[2]});
+
+
+    Mat imgBlur;
+    GaussianBlur(imgCLAHE, imgBlur, Size(5, 5), 0);
+    Mat maskMusculos;
+    inRange(imgBlur, Scalar(a_m), Scalar(b_m), maskMusculos);
+
+    stages.push_back({"Mascara binaria (Musculos)", maskMusculos});
+
+    Mat maskMusculosCuerpo;
+    bitwise_and(maskMusculos, imgBlur, maskMusculosCuerpo);
+    
+    Mat maskHuesos = procesado->filterMedian(segmentoHuesos,k_n);
+    
+    Mat maskHuesosInv;
+    bitwise_not(maskHuesos, maskHuesosInv);
+    
+    Mat maskMusculosSinHuesos;
+    bitwise_and(maskMusculosCuerpo, maskHuesosInv, maskMusculosSinHuesos);
+
+    Mat maskGrasa;
+    inRange(imgBlur, Scalar(12), Scalar(12), maskGrasa);
+    Mat maskGrasaInv;
+    bitwise_not(maskGrasa, maskGrasaInv);
+    
+    bitwise_and(maskMusculosSinHuesos, maskGrasaInv, maskMusculosSinHuesos);
+
+    Mat maskDeteccionMusculos = processor->morphOpening(maskMusculosSinHuesos, 3);
+    
+    // Closing para rellenar huecos internos
+    maskDeteccionMusculos = processor->morphClosing(maskDeteccionMusculos, 5);
+
+    stages.push_back({"Mascara limpia ", maskDeteccionMusculos});
+    // PASO 9: Refinamiento de bordes
+
+    Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+    erode(maskDeteccionMusculos, maskDeteccionMusculos, kernel, Point(-1, -1), 1);
+    dilate(maskDeteccionMusculos, maskDeteccionMusculos, kernel, Point(-1, -1), 1);
+
+    stages.push_back({"Refinamiento de bordes", maskDeteccionMusculos});
+
+    stages.push_back({"Segmentacion de Huesos", procesado->createColorOverlay(procesado->getOriginalImage(), imgHuesosSegmentada, Scalar(255, 0, 0), 0.6)});
+    stages.push_back({"Segmentacion de Musculos", procesado->createColorOverlay(procesado->getOriginalImage(), maskDeteccionMusculos, Scalar(0, 155, 0), 0.6)});
+    stages.push_back({"Segmentacion de Pulmones", procesado->createColorOverlay(procesado->getOriginalImage(), capasPulmones[2], Scalar(0, 255, 255), 0.6)});
 
     PipelineDialog dlg(stages, this);
     dlg.exec();

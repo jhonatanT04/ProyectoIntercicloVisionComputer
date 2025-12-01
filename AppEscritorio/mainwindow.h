@@ -48,7 +48,7 @@ private:
     cv::Mat originalImage;
     void showImage(const cv::Mat &img);
     QImage matToQImage(const cv::Mat &mat);
-    void applyInternalPipeline();       // Aplica filtros internos automáticamente
+    // void applyInternalPipeline();       // Aplica filtros internos automáticamente
 };
 
 #endif // MAINWINDOW_Hy

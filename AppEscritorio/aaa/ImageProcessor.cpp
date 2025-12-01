@@ -196,9 +196,9 @@ Mat ImageProcessor::deteccionHuesos(int a, int b) {
     return maskSoloHuesos;
 }
 
-Mat ImageProcessor::deteccionPulmones(Mat img,int a, int b,int tamanio) {
+std::vector<Mat> ImageProcessor::deteccionPulmones(Mat img,int a, int b,int tamanio) {
     
-    
+    std::vector<Mat> capas;
     
 
     if (img.empty()) {
@@ -210,7 +210,7 @@ Mat ImageProcessor::deteccionPulmones(Mat img,int a, int b,int tamanio) {
     // Convertimos lo oscuro (aire) en blanco (255) y el tejido en negro (0)
     Mat binary;
     threshold(img, binary, a, b, THRESH_BINARY_INV);
-
+    capas.push_back(binary);
     // 3. Eliminar el aire exterior (Fondo)
     // Copiamos la imagen binaria para crear la máscara
     Mat mask = binary.clone();
@@ -227,13 +227,15 @@ Mat ImageProcessor::deteccionPulmones(Mat img,int a, int b,int tamanio) {
     // Aplicamos "Closing" para rellenar huecos internos (vasos sanguíneos)
     // Iterations = 2 para asegurar un buen relleno
     morphologyEx(mask, mask, MORPH_CLOSE, kernel, cv::Point(-1, -1), 2);
-
+    
+    capas.push_back(mask);
     // 5. Aplicar la máscara a la imagen original
     Mat resultado;
     // bitwise_and toma (src1, src2, destination, mask)
     bitwise_and(img, img, resultado, mask);
+    capas.push_back(resultado);
 
-    return resultado;
+    return capas;
 }
 
 Mat ImageProcessor::deteccionMuscular(int a, int b) {
