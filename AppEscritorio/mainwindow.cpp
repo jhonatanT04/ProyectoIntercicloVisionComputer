@@ -362,12 +362,17 @@ void MainWindow::updateFilters()
     
     // PASO 10: Crear visualización con color (opcional)
     Mat resultado = processor->createColorOverlay(img, maskLimpia, Scalar(0, 255, 255), 0.6);
-    
+    Mat resultadoMultiColor = procesado->createMultiColorOverlay(
+        img,                              // Imagen original
+        suavizada2,                       // Máscara 1: Huesos
+        pulmones,                         // Máscara 2: Pulmones
+        maskLimpia,                       // Máscara 3: Músculos
+        Scalar(255, 0, 0),               // Azul para huesos (BGR)
+        Scalar(0, 155, 0),             // Amarillo para pulmones (BGR)
+        Scalar(0, 255, 255),               // Verde para músculos (BGR)
+        0.6                              // Transparencia
+    );
 
-
-    // ============================================================
-    // MOSTRAR RESULTADOS
-    // ============================================================
     ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(img, suavizada2, Scalar(255, 0, 0), 0.6))
                         .scaled(ui->label->width(), ui->label->height(), 
                                Qt::KeepAspectRatio, Qt::SmoothTransformation)));
@@ -383,6 +388,11 @@ void MainWindow::updateFilters()
     ui->label_5->setPixmap(QPixmap::fromImage(matToQImage(imgSuavizada)
                           .scaled(ui->label_5->width(), ui->label_5->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+
+    ui->label_6->setPixmap(QPixmap::fromImage(matToQImage(resultadoMultiColor)
+                          .scaled(ui->label_6->width(), ui->label_6->height(), 
+                                 Qt::KeepAspectRatio, Qt::SmoothTransformation)));
+                                 
 }
 
 // ==================== BOTÓN 2: Pipeline Completo ====================

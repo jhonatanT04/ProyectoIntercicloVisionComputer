@@ -639,7 +639,51 @@ Mat ImageProcessor::eliminarCamilla(Mat img) {
     return resultado;
 }
 
-
+Mat ImageProcessor::createMultiColorOverlay(const Mat& imgOriginal, 
+                                            const Mat& mask1, 
+                                            const Mat& mask2, 
+                                            const Mat& mask3,
+                                            const Scalar& color1,
+                                            const Scalar& color2,
+                                            const Scalar& color3,
+                                            double alpha)
+{
+    // Verificar que la imagen original no esté vacía
+    if (imgOriginal.empty()) {
+        return Mat();
+    }
+    
+    // Convertir imagen original a BGR si es escala de grises
+    Mat resultado;
+    if (imgOriginal.channels() == 1) {
+        cvtColor(imgOriginal, resultado, COLOR_GRAY2BGR);
+    } else {
+        resultado = imgOriginal.clone();
+    }
+    
+    // Aplicar primera máscara (por ejemplo: huesos en azul)
+    if (!mask1.empty()) {
+        Mat overlay1 = resultado.clone();
+        overlay1.setTo(color1, mask1);
+        addWeighted(resultado, 1.0 - alpha, overlay1, alpha, 0, resultado);
+    }
+    
+    // Aplicar segunda máscara (por ejemplo: pulmones en amarillo)
+    if (!mask2.empty()) {
+        Mat overlay2 = resultado.clone();
+        overlay2.setTo(color2, mask2);
+        addWeighted(resultado, 1.0 - alpha, overlay2, alpha, 0, resultado);
+    }
+    
+    // Aplicar tercera máscara (por ejemplo: músculos en verde)
+    if (!mask3.empty()) {
+        Mat overlay3 = resultado.clone();
+        overlay3.setTo(color3, mask3);
+        addWeighted(resultado, 1.0 - alpha, overlay3, alpha, 0, resultado);
+    }
+    
+    return resultado;
+}
 
 // Mat ImageProcessor::deteccionHuesos(int a, int b) {
 //     Mat img = m_originalImage;

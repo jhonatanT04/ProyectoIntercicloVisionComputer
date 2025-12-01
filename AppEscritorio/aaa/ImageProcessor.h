@@ -81,7 +81,14 @@ public:
                              Scalar edgeColor = Scalar(0, 255, 0));
 
     Mat eliminarCamilla(Mat img);
-    
+    Mat createMultiColorOverlay(const Mat& imgOriginal, 
+                                            const Mat& mask1, 
+                                            const Mat& mask2, 
+                                            const Mat& mask3,
+                                            const Scalar& color1,
+                                            const Scalar& color2,
+                                            const Scalar& color3,
+                                            double alpha);
 
 
     // Opcionalmente puedes agregar getters
