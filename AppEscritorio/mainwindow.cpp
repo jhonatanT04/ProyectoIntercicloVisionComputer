@@ -651,25 +651,25 @@ void MainWindow::on_pushButton_3_clicked()
 
 void MainWindow::updateImageByCheckbox()
 {
-    // Si no hay imagen cargada, no hacer nada
     if (originalImage.empty()) {
         return;
     }
 
     if (ui->checkBox_dncnn_suavizado->isChecked()) {
-        // Mostrar imagen DnCNN solo si ya existe
-        if (!dncnnImage.empty()) {
-            showImage(dncnnImage);
+
+        if (dncnnApplied == false) {
+            on_pushButton_3_clicked();   
         }
         else {
-            // Si aún no existe, usar original
-            showImage(originalImage);
+            showImage(dncnnImage);
         }
     }
     else {
+        dncnnApplied = false;
         showImage(originalImage);
     }
 }
+
 
 void MainWindow::showImage(const cv::Mat &img)
 {
