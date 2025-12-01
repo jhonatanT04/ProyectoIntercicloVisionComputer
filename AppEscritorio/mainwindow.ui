@@ -842,16 +842,6 @@
                                                     </property>
                                                 </widget>
                                             </item>
-                                            <item>
-                                                <widget class="QSlider" name="horizontalSlider_6">
-                                                    <property name="orientation">
-                                                        <enum>Qt::Horizontal</enum>
-                                                    </property>
-                                                    <property name="cursor">
-                                                        <cursorShape>PointingHandCursor</cursorShape>
-                                                    </property>
-                                                </widget>
-                                            </item>
                                         </layout>
                                     </item>
 

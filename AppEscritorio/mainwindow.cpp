@@ -37,8 +37,7 @@ MainWindow::MainWindow(QWidget *parent)
     ui->horizontalSlider_5->setRange(1, 255);   
     ui->horizontalSlider_5->setValue(5);
 
-    ui->horizontalSlider_6->setRange(0, 30);    
-    ui->horizontalSlider_6->setValue(3);
+    
 
     ui->horizontalSlider_7->setRange(30, 255);   
     ui->horizontalSlider_7->setValue(125);
@@ -277,7 +276,7 @@ void MainWindow::updateFilters()
     
     int a_m = ui->horizontalSlider_4->value();
     int b_m = ui->horizontalSlider_5->value();
-    int c_m = std::max(1, ui->horizontalSlider_6->value() | 1);
+    
 
 
     int a_p = ui->horizontalSlider_7->value();
