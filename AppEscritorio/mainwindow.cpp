@@ -475,7 +475,6 @@ void MainWindow::on_pushButton_3_clicked()
     
     process.start("python3", arguments);
     
-    // Esperar hasta 60 segundos
     bool finished = process.waitForFinished(60000);
     
     progress.close();
@@ -532,7 +531,7 @@ void MainWindow::on_pushButton_3_clicked()
         cv::cvtColor(denoised, denoisedDisplay, cv::COLOR_BGRA2GRAY);
     }
     
-    // 10. Asegurar mismo tamaño
+    // 10.  mismo tamaño
     if(denoisedDisplay.size() != currentImage.size()) {
         cv::resize(denoisedDisplay, denoisedDisplay, currentImage.size());
     }
@@ -578,7 +577,6 @@ void MainWindow::on_pushButton_3_clicked()
     // 13. Limpiar temporal
     QFile::remove(tempImagePath);
     
-    // 14. Mensaje de éxito
     QMessageBox::information(this, "DnCNN Denoising", 
                             "Denoising completado exitosamente!\n\n"
                             "Modelo: DnCNN Gray Blind (pre-entrenado)\n"
@@ -629,7 +627,6 @@ void MainWindow::showImage(const cv::Mat &img)
 
 void MainWindow::logDataToCSV(const QString &filename)
 {
-    // Escrbir una línea inmediata con Timestamp,RAM_MB
     std::ofstream file(filename.toStdString(), std::ios::app);
     if (!file.is_open()) return;
     double ramMB = getCurrentRAMUsageMB();
@@ -713,13 +710,11 @@ void MainWindow::stopRamSampling()
 
 void MainWindow::flushBufferToFile()
 {
-    // Sobrescribir el CSV con la cabecera y las últimas N=100 filas en memoria
     QStringList localCopy;
     {
         QMutexLocker locker(&bufferMutex);
         if (ramBuffer.isEmpty()) return;
         localCopy = ramBuffer;
-        // no limpiar aquí; mantenemos el buffer como historial en memoria
     }
 
     std::ofstream out(csvFilePath.toStdString(), std::ios::trunc);
