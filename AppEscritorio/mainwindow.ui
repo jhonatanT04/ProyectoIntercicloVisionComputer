@@ -614,7 +614,7 @@
                                                 <item>
                                                     <widget class="QLabel" name="titleResult2">
                                                         <property name="text">
-                                                            <string>MUSCULOS</string>
+                                                            <string>GRASA CORPORAL</string>
                                                         </property>
                                                         <property name="styleSheet">
                                                             <string notr="true">color: #f093fb;
@@ -656,7 +656,7 @@
                                                 <item>
                                                     <widget class="QLabel" name="titleResult3">
                                                         <property name="text">
-                                                            <string>PULMON / MASCARA</string>
+                                                            <string>PULMON</string>
                                                         </property>
                                                         <property name="styleSheet">
                                                             <string notr="true">color: rgba(255,
