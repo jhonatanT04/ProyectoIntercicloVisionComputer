@@ -7,11 +7,6 @@ import cv2
 import os
 
 class DnCNN(nn.Module):
-    """
-    Red DnCNN para eliminación de ruido
-    Arquitectura compatible con pesos pre-entrenados de KAIR
-    Sin BatchNorm (versión original)
-    """
     def __init__(self, channels=1, num_layers=20, num_features=64):
         super(DnCNN, self).__init__()
         
@@ -31,17 +26,11 @@ class DnCNN(nn.Module):
         self.dncnn = nn.Sequential(*layers)
     
     def forward(self, x):
-        # El modelo predice el ruido, no la imagen limpia
         noise = self.dncnn(x)
-        return x - noise  # Imagen limpia = imagen ruidosa - ruido estimado
+        return x - noise  
 
 # ==================== FUNCIONES DE UTILIDAD ====================
 def cargar_imagen_ct(ruta_imagen):
-    """
-    Carga una imagen CT desde archivo
-    Soporta PNG, JPEG, DICOM (.dcm, .IMA, etc)
-    """
-    # Intentar primero como DICOM (para .dcm, .IMA, etc)
     try:
         import pydicom
         ds = pydicom.dcmread(ruta_imagen)
@@ -49,16 +38,14 @@ def cargar_imagen_ct(ruta_imagen):
         print(f"✓ Imagen DICOM cargada: {img.shape}, dtype: {img.dtype}")
         return img
     except Exception as e:
-        # Si falla, intentar como imagen estándar
         img = cv2.imread(ruta_imagen, cv2.IMREAD_GRAYSCALE)
         if img is None:
             raise ValueError(f"No se pudo cargar la imagen: {ruta_imagen}\nError DICOM: {e}")
         img = img.astype(np.float32)
-        print(f"✓ Imagen estándar cargada: {img.shape}")
+        print(f"magen estándar cargada: {img.shape}")
         return img
 
 def normalizar_imagen(img):
-    """Normaliza la imagen al rango [0, 1]"""
     img_min = img.min()
     img_max = img.max()
     if img_max - img_min > 0:
@@ -66,30 +53,18 @@ def normalizar_imagen(img):
     return img
 
 def preprocesar_para_modelo(img):
-    """
-    Prepara la imagen para el modelo DnCNN
-    Input: numpy array [H, W]
-    Output: tensor [1, 1, H, W]
-    """
     img_norm = normalizar_imagen(img)
     img_tensor = torch.from_numpy(img_norm).float()
-    img_tensor = img_tensor.unsqueeze(0).unsqueeze(0)  # [1, 1, H, W]
+    img_tensor = img_tensor.unsqueeze(0).unsqueeze(0)  
     return img_tensor
 
 def posprocesar_resultado(tensor_salida, forma_original):
-    """
-    Convierte la salida del modelo a imagen numpy
-    """
     img_salida = tensor_salida.squeeze().cpu().numpy()
-    img_salida = np.clip(img_salida, 0, 1)  # Asegurar rango [0, 1]
+    img_salida = np.clip(img_salida, 0, 1)  
     return img_salida
 
 # ==================== FUNCIÓN PRINCIPAL ====================
 def reducir_ruido_ct(ruta_imagen, mostrar_resultados=True):
-    """
-    Reduce el ruido de una imagen CT usando DnCNN pre-entrenado
-    """
-    print(f"Cargando imagen: {ruta_imagen}")
     
     # 1. Cargar imagen
     img_original = cargar_imagen_ct(ruta_imagen)
@@ -103,14 +78,11 @@ def reducir_ruido_ct(ruta_imagen, mostrar_resultados=True):
     modelo = DnCNN(channels=1, num_layers=20, num_features=64)
     modelo = modelo.to(device)
     
-    # Cargar pesos pre-entrenados si existen
     peso_path = 'model_zoo/dncnn_gray_blind.pth'
     if os.path.exists(peso_path):
         print(f"✓ Cargando pesos pre-entrenados desde: {peso_path}")
         state_dict = torch.load(peso_path, map_location=device)
-        
-        # Ajustar nombres de las capas si es necesario
-        # Los pesos usan 'model.X' pero nuestra arquitectura usa 'dncnn.X'
+
         new_state_dict = {}
         for k, v in state_dict.items():
             if k.startswith('model.'):
@@ -122,11 +94,7 @@ def reducir_ruido_ct(ruta_imagen, mostrar_resultados=True):
         modelo.load_state_dict(new_state_dict)
         print("✓ Modelo pre-entrenado cargado exitosamente!")
     else:
-        print("⚠️  ADVERTENCIA: No se encontraron pesos pre-entrenados")
-        print(f"   Buscando en: {peso_path}")
-        print("   Descarga con: wget https://github.com/cszn/KAIR/releases/download/v1.0/dncnn_gray_blind.pth -O model_zoo/dncnn_gray_blind.pth")
-        print("   Continuando con pesos aleatorios (resultados serán pobres)...")
-    
+        print("ADVERTENCIA: No se encontraron pesos pre-entrenados")
     modelo.eval()
     
     # 3. Preprocesar
@@ -166,22 +134,19 @@ def reducir_ruido_ct(ruta_imagen, mostrar_resultados=True):
     
     return img_limpia, img_original_norm
 
-# ==================== EJEMPLO DE USO ====================
 if __name__ == "__main__":
     import sys
     
-    # Obtener ruta de imagen desde argumentos o usar default
     if len(sys.argv) > 1:
         ruta_imagen = sys.argv[1]
-        print(f"📥 Imagen recibida desde Qt: {ruta_imagen}")
+        print(f"Imagen recibida desde Qt: {ruta_imagen}")
     else:
-        # Ruta por defecto si se ejecuta directamente
         ruta_imagen = "imgAnalizar/ApicePulmonar/L143_QD_1_1.CT.0004.0053.2015.12.22.20.45.11.504991.358762830.IMA"
-        print(f"📂 Usando ruta por defecto: {ruta_imagen}")
+        print(f" Usando ruta por defecto: {ruta_imagen}")
     
     # Verificar que la ruta existe
     if not os.path.exists(ruta_imagen):
-        print(f"❌ Error: No se encontró la imagen en '{ruta_imagen}'")
+        print(f"Error: No se encontró la imagen en '{ruta_imagen}'")
         sys.exit(1)
     
     try:
@@ -205,21 +170,7 @@ if __name__ == "__main__":
         sys.exit(0)
         
     except Exception as e:
-        print(f"❌ Error durante el procesamiento: {str(e)}")
+        print(f"Error: {str(e)}")
         import traceback
         traceback.print_exc()
         sys.exit(1)
-
-# ==================== CARGAR PESOS PRE-ENTRENADOS ====================
-"""
-Para usar un modelo realmente entrenado, descarga los pesos y cárgalos así:
-
-# Descargar de: https://github.com/cszn/KAIR/releases
-modelo.load_state_dict(torch.load('dncnn_gray_blind.pth', map_location=device))
-
-Modelos disponibles:
-- dncnn_15.pth: Para ruido Gaussiano sigma=15
-- dncnn_25.pth: Para ruido Gaussiano sigma=25  
-- dncnn_50.pth: Para ruido Gaussiano sigma=50
-- dncnn_gray_blind.pth: Para ruido desconocido (RECOMENDADO para CT)
-"""
