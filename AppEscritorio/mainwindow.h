@@ -17,7 +17,7 @@
 #include <QMutex>
 #include <QStringList>
 #include <opencv2/opencv.hpp>
-#include "ProcesadoIMGc/CTProcessorSimple.h"
+#include <fstream>
 #include "aaa/ImageProcessor.h"
 #include <QCloseEvent>
 
@@ -60,7 +60,7 @@ private:
 
 private:
     Ui::MainWindow *ui;
-    CTImageProcessor *processor;        // Procesador de imágenes
+    
     ImageProcessor *procesado;          // Procesador de imágenes
     cv::Mat currentImage;               // Imagen original
     cv::Mat pipelineImage;              // Imagen con pipeline interno

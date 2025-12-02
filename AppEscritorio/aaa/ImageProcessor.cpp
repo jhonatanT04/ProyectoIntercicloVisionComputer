@@ -27,20 +27,6 @@ ImageProcessor::ImageProcessor() {
 
 ImageProcessor::~ImageProcessor() {}
 
-
-Mat procesarIMG16a8(const Mat img16) {
-
-    if (img16.empty() || img16.type() != CV_16SC1) {
-        cerr << "Error: Imagen inválida para conversión" << endl;
-        return Mat();
-    }
-
-    Mat img8;
-    normalize(img16, img8, 0, 255, NORM_MINMAX, CV_8U);
-
-    return img8;
-}
-
 bool ImageProcessor::loadImage(const string& filePath) {
     cout << "Loading: " << filePath << endl;
     
@@ -107,94 +93,166 @@ bool ImageProcessor::loadImage(const string& filePath) {
     }
 }
 
-Mat equializadaHistograma( Mat img) {
-    // Mat imgEcualizada;
-    // equalizeHist(img, imgEcualizada);
-    // return imgEcualizada;
 
+
+Mat ImageProcessor::eliminarCamilla(Mat img) {
+    Mat binaria;
+    threshold(img, binaria, 30, 255, THRESH_BINARY);
     
-    Mat img_lab;
-    if (img.empty()) {
-        cout << "Error: No se pudo cargar la imagen." << endl;
-        return Mat();
+    // 2. Eliminar ruido con morfología
+    Mat limpia = morphClosing(binaria, 10);
+    
+    // 3. Encontrar todos los contornos
+    vector<vector<cv::Point>> contours;
+    findContours(limpia.clone(), contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
+    
+    // 4. Encontrar el contorno más grande (el cuerpo)
+    if (contours.empty()) {
+        cout << "No se encontraron contornos" << endl;
+        return img;
     }
-
-    Ptr<CLAHE> clahe = createCLAHE();
-    clahe->setClipLimit(2.0);  // Límite de contraste
-    clahe->setTilesGridSize(cv::Size(8, 8));  // Tamaño de grid
     
-    Mat img_clahe;
-    clahe->apply(img, img_clahe);
+    int indiceMax = 0;
+    double areaMax = 0;
     
+    for (size_t i = 0; i < contours.size(); i++) {
+        double area = contourArea(contours[i]);
+        if (area > areaMax) {
+            areaMax = area;
+            indiceMax = i;
+        }
+    }
     
-    return img_clahe;
-}
-
-
-Mat stretchingParaTomografia(const Mat img, int min_intensidad = 50, int max_intensidad = 250) {
-    cv::Mat resultado;
+    // 5. Crear máscara solo con el contorno del cuerpo
+    Mat maskCuerpo = Mat::zeros(img.size(), CV_8U);
+    drawContours(maskCuerpo, contours, indiceMax, Scalar(255), -1);
     
-    // Aplicar stretching en un rango específico
-    double alpha = 255.0 / (max_intensidad - min_intensidad);
-    double beta = -min_intensidad * alpha;
+    // 6. Erosionar un poco para eliminar piel/grasa superficial
+    Mat maskErosionada = morphErosion(maskCuerpo, 10);
     
-    img.convertTo(resultado, CV_8U, alpha, beta);
-    
-    // Clip valores
-    cv::Mat clipped;
-    cv::max(resultado, 0, clipped);
-    cv::min(clipped, 255, resultado);
+    // 7. Aplicar máscara
+    Mat resultado = Mat::zeros(img.size(), CV_8U);
+    img.copyTo(resultado, maskErosionada);
     
     return resultado;
 }
 
-Mat ImageProcessor::deteccionHuesos(int a, int b) {
-    // A es el valor del umbral (ej. 200)
-    // B es el valor máximo (normalmente 255)
+// ============ NORMALIZACIÓN Y CONTRASTE ============
+
+
+Mat ImageProcessor::applyCLAHE( Mat input, double clipLimit) {
+    Mat output, gray;
+    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
+    else gray = input.clone();
+    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
     
-    // 1. Validar imagen
-    // Usamos clone() para no modificar la original si es una variable miembro
-    // Mat ania = m_originalImage.clone(); 
-    // Mat img = equializadaHistograma(ania);
-    Mat img = m_originalImage.clone();
-    if (img.empty()) {
-        cout << "Error: No hay imagen cargada en m_originalImage." << endl;
-        return Mat();
-    }
-
-    // 2. Pre-procesamiento
-    Mat imgBlur;
-    GaussianBlur(img, imgBlur, cv::Size(5, 5), 0);
-
-    // 3. Umbralización
-    Mat maskHuesos;
-    // CORRECCIÓN 1: Usar THRESH_BINARY.
-    // Necesitamos bordes definidos (0 o 255) para que findContours funcione bien.
-    threshold(imgBlur, maskHuesos, (double)a, (double)b, THRESH_BINARY);
-
-    // 4. Encontrar Contornos
-    // CORRECCIÓN 2: Usar 'vector<vector<Point>>'
-    vector<vector<cv::Point>> contours;
-    vector<Vec4i> hierarchy;
-    
-    // Encontrar los bordes de las zonas blancas
-    findContours(maskHuesos, contours, hierarchy, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-
-    // 5. Filtrar por Área (Eliminar ruido)
-    Mat maskSoloHuesos = Mat::zeros(maskHuesos.size(), CV_8UC1);
-
-    for (size_t i = 0; i < contours.size(); i++) {
-        double area = contourArea(contours[i]);
-
-        // Si el área es mayor a 50 pixeles, lo dibujamos (es hueso).
-        // Si es menor, lo ignoramos (es ruido/manchas).
-        if (area > 50.0) { 
-            drawContours(maskSoloHuesos, contours, (int)i, Scalar(255), -1);
-        }
-    }
-
-    return maskSoloHuesos;
+    auto clahe = createCLAHE(clipLimit, cv::Size(8, 8));
+    clahe->apply(gray, output);
+    return output;
 }
+
+// ============ THRESHOLDING ============
+Mat ImageProcessor::thresholdIMG( Mat input, int threshValue) {
+    Mat output, gray;
+    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
+    else gray = input.clone();
+    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
+    
+    threshold(gray, output, threshValue, 255, THRESH_BINARY);
+    return output;
+}
+
+Mat ImageProcessor::segmentByIntensity( Mat input, int lower, int upper) {
+    Mat output, gray;
+    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
+    else gray = input.clone();
+    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
+    
+    inRange(gray, Scalar(lower), Scalar(upper), output);
+    return output;
+}
+// ============ OPERACIONES LÓGICAS ============
+Mat ImageProcessor::applyNOT( Mat input) {
+    Mat output;
+    bitwise_not(input, output);
+    return output;
+}
+
+Mat ImageProcessor::applyAND( Mat input1,  Mat input2) {
+    Mat output;
+    bitwise_and(input1, input2, output);
+    return output;
+}
+
+Mat ImageProcessor::applyOR( Mat input1,  Mat input2) {
+    Mat output;
+    bitwise_or(input1, input2, output);
+    return output;
+}
+
+Mat ImageProcessor::applyXOR( Mat input1,  Mat input2) {
+    Mat output;
+    bitwise_xor(input1, input2, output);
+    return output;
+}
+
+
+
+// ============ FILTROS DE SUAVIZADO ============
+Mat ImageProcessor::filterGaussian( Mat input, int ksize) {
+    if (ksize % 2 == 0) ksize++;  // Asegurar impar
+    Mat output;
+    GaussianBlur(input, output, cv::Size(ksize, ksize), 0);
+    return output;
+}
+
+Mat ImageProcessor::filterMedian( Mat input, int ksize) {
+    if (ksize % 2 == 0) ksize++;  // Asegurar impar
+    Mat output;
+    medianBlur(input, output, ksize);
+    return output;
+}
+
+
+Mat ImageProcessor::filterNLMeans( Mat input) {
+    Mat output, gray;
+    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
+    else gray = input.clone();
+    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
+    
+    fastNlMeansDenoising(gray, output, 10, 7, 21);
+    return output;
+}
+
+// ============ MORFOLOGÍA ============
+Mat ImageProcessor::morphErosion( Mat input, int ksize) {
+    Mat output;
+    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
+    erode(input, output, kernel);
+    return output;
+}
+
+Mat ImageProcessor::morphDilation( Mat input, int ksize) {
+    Mat output;
+    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
+    dilate(input, output, kernel);
+    return output;
+}
+
+Mat ImageProcessor::morphOpening( Mat input, int ksize) {
+    Mat output;
+    Mat kernel = getStructuringElement(MORPH_RECT, cv::Size(ksize, ksize));
+    morphologyEx(input, output, MORPH_OPEN, kernel);
+    return output;
+}
+
+Mat ImageProcessor::morphClosing( Mat input, int ksize) {
+    Mat output;
+    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
+    morphologyEx(input, output, MORPH_CLOSE, kernel);
+    return output;
+}
+
 
 std::vector<Mat> ImageProcessor::deteccionPulmones(Mat img,int a, int b,int tamanio) {
     
@@ -237,291 +295,6 @@ std::vector<Mat> ImageProcessor::deteccionPulmones(Mat img,int a, int b,int tama
 
     return capas;
 }
-
-Mat ImageProcessor::deteccionMuscular(int a, int b) {
-    Mat img = m_originalImage.clone();
-
-    if (img.empty()) {
-        cout << "Error: No se pudo cargar la imagen." << endl;
-        return Mat();
-    }
-
-    // 2. Suavizado (GaussianBlur)
-    Mat imgBlur;
-    // Size(5,5) ya no necesita cv::Size
-    GaussianBlur(img, imgBlur, cv::Size(5, 5), 0);
-
-    // 3. Rango de intensidad para Músculos
-    Mat mask;
-    
-    // Scalar(...) define el valor del píxel
-    inRange(imgBlur, Scalar(a), Scalar(b), mask);
-
-    // 4. Limpieza (Morfología)
-    // MORPH_RECT y MORPH_OPEN son constantes del namespace
-    Mat kernel = getStructuringElement(MORPH_RECT, cv::Size(3, 3));
-    Mat maskClean;
-    morphologyEx(mask, maskClean, MORPH_OPEN, kernel);
-
-    // 5. Aplicar máscara
-    Mat result;
-    img.copyTo(result, maskClean);
-
-    return result;
-
-}
-
-Mat ImageProcessor::imgEcualizada() {
-    Mat img = m_originalImage;
-    Mat img_lab;
-    if (img.empty()) {
-        cout << "Error: No se pudo cargar la imagen." << endl;
-        return Mat();
-    }
-
-    Ptr<CLAHE> clahe = createCLAHE();
-    clahe->setClipLimit(4.0);  // Límite de contraste
-    clahe->setTilesGridSize(cv::Size(8, 8));  // Tamaño de grid
-    
-    Mat img_clahe;
-    clahe->apply(img, img_clahe);
-    
-    
-    return img_clahe;
-}
-
-Mat ImageProcessor::contrastStretching(int a, int b) {
-    Mat img = m_originalImage.clone();
-    if (img.empty()) {
-        cout << "Error: No se pudo cargar la imagen." << endl;
-        return Mat();
-    }
-
-    Mat img_stretched = stretchingParaTomografia(img, a, b);
-    return img_stretched;
-}
-
-// ============ NORMALIZACIÓN Y CONTRASTE ============
-Mat ImageProcessor::normalizeImage(Mat input) {
-    Mat output;
-    normalize(input, output, 0, 255, NORM_MINMAX, CV_8UC1);
-    return output;
-}
-
-Mat ImageProcessor::contrastStretching( Mat input) {
-    return normalizeImage(input);
-}
-
-Mat ImageProcessor::applyCLAHE( Mat input, double clipLimit) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    auto clahe = createCLAHE(clipLimit, cv::Size(8, 8));
-    clahe->apply(gray, output);
-    return output;
-}
-
-Mat ImageProcessor::histogramEqualization( Mat input) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    equalizeHist(gray, output);
-    return output;
-}
-
-// ============ THRESHOLDING ============
-Mat ImageProcessor::thresholdIMG( Mat input, int threshValue) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    threshold(gray, output, threshValue, 255, THRESH_BINARY);
-    return output;
-}
-
-Mat ImageProcessor::thresholdOtsu( Mat input) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    threshold(gray, output, 0, 255, THRESH_BINARY | THRESH_OTSU);
-    return output;
-}
-
-Mat ImageProcessor::thresholdAdaptive( Mat input, int blockSize) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    if (blockSize % 2 == 0) blockSize++;  // Asegurar que es impar
-    adaptiveThreshold(gray, output, 255, ADAPTIVE_THRESH_GAUSSIAN_C, 
-                         THRESH_BINARY, blockSize, 2);
-    return output;
-}
-
-// ============ OPERACIONES LÓGICAS ============
-Mat ImageProcessor::applyNOT( Mat input) {
-    Mat output;
-    bitwise_not(input, output);
-    return output;
-}
-
-Mat ImageProcessor::applyAND( Mat input1,  Mat input2) {
-    Mat output;
-    bitwise_and(input1, input2, output);
-    return output;
-}
-
-Mat ImageProcessor::applyOR( Mat input1,  Mat input2) {
-    Mat output;
-    bitwise_or(input1, input2, output);
-    return output;
-}
-
-Mat ImageProcessor::applyXOR( Mat input1,  Mat input2) {
-    Mat output;
-    bitwise_xor(input1, input2, output);
-    return output;
-}
-
-// ============ DETECCIÓN DE BORDES ============
-Mat ImageProcessor::edgeCanny( Mat input, int low, int high) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    GaussianBlur(gray, gray, cv::Size(5, 5), 1.4);
-    Canny(gray, output, low, high);
-    return output;
-}
-
-Mat ImageProcessor::edgeSobel( Mat input) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    Mat gradX, gradY;
-    Sobel(gray, gradX, CV_16S, 1, 0, 3);
-    Sobel(gray, gradY, CV_16S, 0, 1, 3);
-    
-    Mat absGradX, absGradY;
-    convertScaleAbs(gradX, absGradX);
-    convertScaleAbs(gradY, absGradY);
-    addWeighted(absGradX, 0.5, absGradY, 0.5, 0, output);
-    return output;
-}
-
-Mat ImageProcessor::edgeLaplacian( Mat input) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    Mat laplacian;
-    Laplacian(gray, laplacian, CV_16S, 3);
-    convertScaleAbs(laplacian, output);
-    return output;
-}
-
-// ============ FILTROS DE SUAVIZADO ============
-Mat ImageProcessor::filterGaussian( Mat input, int ksize) {
-    if (ksize % 2 == 0) ksize++;  // Asegurar impar
-    Mat output;
-    GaussianBlur(input, output, cv::Size(ksize, ksize), 0);
-    return output;
-}
-
-Mat ImageProcessor::filterMedian( Mat input, int ksize) {
-    if (ksize % 2 == 0) ksize++;  // Asegurar impar
-    Mat output;
-    medianBlur(input, output, ksize);
-    return output;
-}
-
-Mat ImageProcessor::filterBilateral( Mat input, int d) {
-    Mat output, gray;
-    if (input.depth() != CV_8U) input.convertTo(gray, CV_8UC1);
-    else gray = input.clone();
-    
-    bilateralFilter(gray, output, d, 75, 75);
-    return output;
-}
-
-Mat ImageProcessor::filterMean( Mat input, int ksize) {
-    Mat output;
-    blur(input, output, cv::Size(ksize, ksize));
-    return output;
-}
-
-Mat ImageProcessor::filterNLMeans( Mat input) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    fastNlMeansDenoising(gray, output, 10, 7, 21);
-    return output;
-}
-
-// ============ MORFOLOGÍA ============
-Mat ImageProcessor::morphErosion( Mat input, int ksize) {
-    Mat output;
-    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
-    erode(input, output, kernel);
-    return output;
-}
-
-Mat ImageProcessor::morphDilation( Mat input, int ksize) {
-    Mat output;
-    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
-    dilate(input, output, kernel);
-    return output;
-}
-
-Mat ImageProcessor::morphOpening( Mat input, int ksize) {
-    Mat output;
-    Mat kernel = getStructuringElement(MORPH_RECT, cv::Size(ksize, ksize));
-    morphologyEx(input, output, MORPH_OPEN, kernel);
-    return output;
-}
-
-Mat ImageProcessor::morphClosing( Mat input, int ksize) {
-    Mat output;
-    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
-    morphologyEx(input, output, MORPH_CLOSE, kernel);
-    return output;
-}
-
-Mat ImageProcessor::morphGradient( Mat input, int ksize) {
-    Mat output;
-    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
-    morphologyEx(input, output, MORPH_GRADIENT, kernel);
-    return output;
-}
-
-Mat ImageProcessor::morphTopHat( Mat input, int ksize) {
-    Mat output;
-    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
-    morphologyEx(input, output, MORPH_TOPHAT, kernel);
-    return output;
-}
-
-Mat ImageProcessor::morphBlackHat( Mat input, int ksize) {
-    Mat output;
-    Mat kernel = getStructuringElement(MORPH_ELLIPSE, cv::Size(ksize, ksize));
-    morphologyEx(input, output, MORPH_BLACKHAT, kernel);
-    return output;
-}
-
 // ============ VISUALIZACIÓN ============
 Mat ImageProcessor::createColorOverlay( Mat original,  Mat mask, 
                                               Scalar color, double alpha) {
@@ -545,20 +318,12 @@ Mat ImageProcessor::createHeatmap( Mat input) {
     return output;
 }
 
-Mat ImageProcessor::segmentByIntensity( Mat input, int lower, int upper) {
-    Mat output, gray;
-    if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
-    else gray = input.clone();
-    if (gray.depth() != CV_8U) gray.convertTo(gray, CV_8UC1);
-    
-    inRange(gray, Scalar(lower), Scalar(upper), output);
-    return output;
-}
 
-// ============ RESALTAR REGIÓN (NUEVO) ============
+// ============ RESALTAR REGIÓN  ============
 Mat ImageProcessor::highlightRegion(String name,Mat mask,  Mat background, Scalar color) {
     vector<vector<cv::Point>> contours;
     Mat maskCopy = mask.clone();
+
     findContours(maskCopy, contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
     
     Mat output;
@@ -576,7 +341,7 @@ Mat ImageProcessor::highlightRegion(String name,Mat mask,  Mat background, Scala
         }
     }
     
-    // Dibujar contornos amarillos
+    
     drawContours(output, contours, -1, color, 2);
     
     // Dibujar rectángulos y etiquetas
@@ -597,49 +362,6 @@ Mat ImageProcessor::highlightRegion(String name,Mat mask,  Mat background, Scala
     return output;
 }
 
-Mat ImageProcessor::eliminarCamilla(Mat img) {
-    
-    // 1. Umbralizar
-    Mat binaria;
-    threshold(img, binaria, 30, 255, THRESH_BINARY);
-    
-    // 2. Eliminar ruido con morfología
-    Mat limpia = morphClosing(binaria, 10);
-    
-    // 3. Encontrar todos los contornos
-    vector<vector<cv::Point>> contours;
-    findContours(limpia.clone(), contours, RETR_EXTERNAL, CHAIN_APPROX_SIMPLE);
-    
-    // 4. Encontrar el contorno más grande (el cuerpo)
-    if (contours.empty()) {
-        cout << "No se encontraron contornos" << endl;
-        return img;
-    }
-    
-    int indiceMax = 0;
-    double areaMax = 0;
-    
-    for (size_t i = 0; i < contours.size(); i++) {
-        double area = contourArea(contours[i]);
-        if (area > areaMax) {
-            areaMax = area;
-            indiceMax = i;
-        }
-    }
-    
-    // 5. Crear máscara solo con el contorno del cuerpo
-    Mat maskCuerpo = Mat::zeros(img.size(), CV_8U);
-    drawContours(maskCuerpo, contours, indiceMax, Scalar(255), -1);
-    
-    // 6. Erosionar un poco para eliminar piel/grasa superficial
-    Mat maskErosionada = morphErosion(maskCuerpo, 10);
-    
-    // 7. Aplicar máscara
-    Mat resultado = Mat::zeros(img.size(), CV_8U);
-    img.copyTo(resultado, maskErosionada);
-    
-    return resultado;
-}
 
 Mat ImageProcessor::createMultiColorOverlay(const Mat& imgOriginal, 
                                             const Mat& mask1, 
@@ -650,7 +372,7 @@ Mat ImageProcessor::createMultiColorOverlay(const Mat& imgOriginal,
                                             const Scalar& color3,
                                             double alpha)
 {
-    // Verificar que la imagen original no esté vacía
+    
     if (imgOriginal.empty()) {
         return Mat();
     }
@@ -686,40 +408,3 @@ Mat ImageProcessor::createMultiColorOverlay(const Mat& imgOriginal,
     
     return resultado;
 }
-
-// Mat ImageProcessor::deteccionHuesos(int a, int b) {
-//     Mat img = m_originalImage;
-
-//     if (img.empty()) {
-//         cout << "Error: No se pudo cargar la imagen. Revisa el nombre del archivo." << endl;
-//         return Mat();
-//     }
-
-//     // 1. Pre-procesamiento: Suavizar la imagen
-//     // Esto es como aplicar un pequeño desenfoque para que el color sea más uniforme.
-//     Mat imgBlur;
-//     GaussianBlur(img, imgBlur, Size(5, 5), 0);
-
-//     // 2. Umbralización: ¡ESTA ES LA CLAVE!
-//     Mat maskHuesos;
-//     // CAMBIO IMPORTANTE: Hemos subido el umbral de 200 a 230.
-//     // Esto significa: "Solo marca como blanco lo que sea SUPER brillante".
-//     // Si con 230 desaparecen partes de las costillas, prueba con 225.
-//     // Si sigue apareciendo mancha en el centro, prueba con 235 o 240.
-    
-//     threshold(imgBlur, maskHuesos, a, b, THRESH_BINARY);
-
-//     // 3. Limpieza (Operación Morfológica)
-//     Mat maskLimpia;
-//     // Creamos un pequeño "pincel" cuadrado de 3x3 píxeles
-//     Mat kernel = getStructuringElement(MORPH_RECT, cv::Size(3, 3));
-    
-//     // EROSIÓN: Esto "come" los bordes de las zonas blancas.
-//     // Eliminará los puntitos pequeños (ruido) y limpiará los bordes rugosos.
-//     erode(maskHuesos, maskLimpia, kernel);
-    
-//     // (Opcional) Si ves que la erosión dejó los huesos muy finos,
-//     // puedes descomentar la siguiente línea para "re-inflarlos" un poco.
-//     // dilate(maskLimpia, maskLimpia, kernel);
-//     return maskLimpia;
-// }

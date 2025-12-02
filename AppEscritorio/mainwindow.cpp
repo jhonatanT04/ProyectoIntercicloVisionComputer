@@ -12,10 +12,10 @@ MainWindow::MainWindow(QWidget *parent)
     , ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
-    processor = new CTImageProcessor("output");  
+    
     procesado = new ImageProcessor();
 
-    // Preparar carpeta output y ruta del CSV (no abrimos el archivo todavía)
+    
     QDir outDir("output");
     if (!outDir.exists()) outDir.mkpath(".");
     csvFilePath = outDir.filePath("ram_log.csv");
@@ -29,8 +29,8 @@ MainWindow::MainWindow(QWidget *parent)
         ui->label_RAM->setText(QString("RAM usada: %1 MB").arg(ramMB, 0, 'f', 1));
     });
 
-    ramTimer->start(1000);   // actualizar cada 1 segundo
-    // Configurar rangos de sliders
+    ramTimer->start(1000);   
+
     ui->horizontalSlider->setRange(100, 255);      
     ui->horizontalSlider->setValue(170);
 
@@ -41,24 +41,25 @@ MainWindow::MainWindow(QWidget *parent)
     ui->horizontalSlider_3->setValue(3);
 
 
-    ui->horizontalSlider_4->setRange(30, 255);   
+
+    ui->horizontalSlider_4->setRange(1, 255);   
     ui->horizontalSlider_4->setValue(70);
 
     ui->horizontalSlider_5->setRange(1, 255);   
     ui->horizontalSlider_5->setValue(200);
 
-    
 
-    ui->horizontalSlider_7->setRange(30, 255);   
+
+    ui->horizontalSlider_7->setRange(30, 100);   
     ui->horizontalSlider_7->setValue(30);
 
-    ui->horizontalSlider_8->setRange(1, 255);   
+    ui->horizontalSlider_8->setRange(200, 255);   
     ui->horizontalSlider_8->setValue(200);
 
-    ui->horizontalSlider_9->setRange(0, 30);    
+    ui->horizontalSlider_9->setRange(0, 10);    
     ui->horizontalSlider_9->setValue(5);
     
-    // Conectar sliders para tiempo real
+    
     connect(ui->horizontalSlider, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
     connect(ui->horizontalSlider_2, &QSlider::valueChanged,
@@ -79,18 +80,18 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->checkBox_dncnn_suavizado, &QCheckBox::stateChanged,
         this, &MainWindow::updateImageByCheckbox);
 
-    // Nota: ya iniciamos startRamSampling arriba
+    
 
 }
 
 MainWindow::~MainWindow()
 {
-    delete processor;
+    
     delete ui;
     delete procesado;
 }
 
-// ==================== Conversión Mat -> QImage ====================
+
 QImage MainWindow::matToQImage(const cv::Mat &mat)
 {
     if(mat.empty()) return QImage();
@@ -106,14 +107,14 @@ QImage MainWindow::matToQImage(const cv::Mat &mat)
                       QImage::Format_RGB888).copy();
     }
     
-    // Si es otro tipo, normalizar primero
+   
     cv::Mat normalized;
     cv::normalize(mat, normalized, 0, 255, cv::NORM_MINMAX, CV_8UC1);
     return QImage(normalized.data, normalized.cols, normalized.rows, 
                   normalized.step, QImage::Format_Grayscale8).copy();
 }
 
-// ==================== BOTÓN 1: Cargar Imagen ====================
+
 void MainWindow::on_pushButton_clicked()
 {
     QString fileName = QFileDialog::getOpenFileName(
@@ -124,25 +125,26 @@ void MainWindow::on_pushButton_clicked()
     
     if(fileName.isEmpty()) return;
 
-    if (!processor->loadImage(fileName.toStdString())) {
+    if (!procesado->loadImage(fileName.toStdString())) {
         QMessageBox::warning(this, "Error", "No se pudo cargar la imagen.");
         return;
     }
     
-    procesado->loadImage(fileName.toStdString());
+    
+
+    
     Mat img = procesado->getOriginalImage();
     currentImage = img.clone();  
 
     if (ui->checkBox_dncnn_suavizado->isChecked()) {
 
-        // Ejecutar la función del botón 3 que usa DnCNN
+        
         on_pushButton_3_clicked();
 
-        // Guardar imagen obtenida por DnCNN
+        
         dncnnApplied = true;
-        currentImage = dncnnImage.clone();   // USAR imagen DnCNN para todo
-
-        // Mostrar en label para verificar
+        currentImage = dncnnImage.clone();   
+        
         ui->label->setPixmap(QPixmap::fromImage(matToQImage(dncnnImage)
                           .scaled(ui->label->width(), ui->label->height(),
                                   Qt::KeepAspectRatio, Qt::SmoothTransformation)));
@@ -157,17 +159,11 @@ void MainWindow::on_pushButton_clicked()
     showImage(originalImage);
     updateImageByCheckbox();
 
-    // Aplicar pipeline interno automáticamente
-    // applyInternalPipeline();
-
-    // Actualizar sliders en tiempo real
+    
     updateFilters();
 }
 
-// ==================== Pipeline Interno OPTIMIZADO ====================
 
-
-// ==================== Update Filters (Tiempo Real) ====================
 void MainWindow::updateFilters()
 {
     if(currentImage.empty()) return;
@@ -187,44 +183,38 @@ void MainWindow::updateFilters()
     int a_p = ui->horizontalSlider_7->value();
     int b_p = ui->horizontalSlider_8->value();
     int c_p = std::max(1, ui->horizontalSlider_9->value() | 1);
+
     // ============================================================
     // PROCESAMIENTO
     // ============================================================
+
     Mat img = procesado->getOriginalImage();
 
     Mat imgSuavizada = procesado->filterMedian(img, k_n);
-    //Mat imgSuavizada = procesado->filterMedian(img, 5);
     
-    
-    // Mat img = procesado->eliminarCamilla(img);
     bool checkedDnCNN = ui->checkBox_dncnn_suavizado->isChecked();
+
     if (checkedDnCNN && dncnnApplied) {
-        img = dncnnImage.clone();   // Usar imagen suavizada
+        img = dncnnImage.clone();  
     }
     else{
         img = imgSuavizada.clone();
     }
 
-    Mat imgCLAHE = processor->applyCLAHE( procesado->eliminarCamilla(img), 3);
-    Mat imgMejoramiento = processor->segmentByIntensity(imgCLAHE, a_h, 255);
-
-    Mat imgMejSuavizada = processor->filterNLMeans(imgMejoramiento);
-    Mat suavizada2 = processor->filterMedian(imgMejSuavizada, b_h);
-
-    //suavizada2 = processor->morphDilation(suavizada2, k_n);
+    Mat imgCLAHE = procesado->applyCLAHE( procesado->eliminarCamilla(img), 3);
+    Mat imgMejoramiento = procesado->segmentByIntensity(imgCLAHE, a_h, 255);
+    Mat imgMejSuavizada = procesado->filterNLMeans(imgMejoramiento);
+    Mat segmentacionHuesos = procesado->filterMedian(imgMejSuavizada, b_h);
+    
+    //segmentacionHuesos = processor->morphDilation(segmentacionHuesos, k_n);
 
     std::vector<Mat> capasPulmones = procesado->deteccionPulmones(procesado->eliminarCamilla(img), a_p,b_p,c_p);
-    
-    Mat pulmones = capasPulmones[2];
+    Mat segementacionPulmones = capasPulmones[2];
 
-    // PASO 1: Preprocesamiento - CLAHE para mejorar contraste
-    Mat imgCLAHEmus = procesado->applyCLAHE(procesado->eliminarCamilla(img), 3.0);
     
-    // PASO 2: Suavizado para reducir ruido
+    Mat imgCLAHEmus = procesado->applyCLAHE(procesado->eliminarCamilla(img), 3.0);
     Mat imgBlur;
     GaussianBlur(imgCLAHEmus, imgBlur, Size(5, 5), 0);
-    
-    // PASO 3: Eliminar la camilla/fondo
     Mat maskCuerpo = imgBlur;
     
     // PASO 4: Segmentación por intensidad de músculos
@@ -255,35 +245,35 @@ void MainWindow::updateFilters()
     
     // PASO 8: Limpieza morfológica
     // Opening para eliminar ruido pequeño
-    Mat maskLimpia = processor->morphOpening(maskMusculosSinHuesos, 3);
+    Mat segmentacionMusculos = procesado->morphOpening(maskMusculosSinHuesos, 3);
     
     // Closing para rellenar huecos internos
-    maskLimpia = processor->morphClosing(maskLimpia, 5);
+    segmentacionMusculos = procesado->morphClosing(segmentacionMusculos, 5);
     
     // PASO 9: Refinamiento de bordes
     Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
-    erode(maskLimpia, maskLimpia, kernel, Point(-1, -1), 1);
-    dilate(maskLimpia, maskLimpia, kernel, Point(-1, -1), 1);
+    erode(segmentacionMusculos, segmentacionMusculos, kernel, Point(-1, -1), 1);
+    dilate(segmentacionMusculos, segmentacionMusculos, kernel, Point(-1, -1), 1);
     
     // PASO 10: Crear visualización con color (opcional)
-    Mat resultado = processor->createColorOverlay(procesado->getOriginalImage(), maskLimpia, Scalar(0, 255, 255), 0.6);
+    Mat resultado = procesado->createColorOverlay(procesado->getOriginalImage(), segmentacionMusculos, Scalar(0, 255, 255), 0.6);
     
     Mat resultadoMultiColor = procesado->createMultiColorOverlay(
-        procesado->getOriginalImage(),                              // Imagen original
-        suavizada2,                       // Máscara 1: Huesos
-        pulmones,                         // Máscara 2: Pulmones
-        maskLimpia,                       // Máscara 3: Músculos
-        Scalar(255, 0, 0),               // Azul para huesos (BGR)
-        Scalar(0, 155, 0),             // Amarillo para pulmones (BGR)
-        Scalar(0, 255, 255),               // Verde para músculos (BGR)
-        0.6                              // Transparencia
+        procesado->getOriginalImage(),   
+        segmentacionHuesos,              
+        segementacionPulmones,           
+        segmentacionMusculos,                      
+        Scalar(255, 0, 0),               
+        Scalar(0, 155, 0),             
+        Scalar(0, 255, 255),               
+        0.6                              
     );
 
-    ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(procesado->getOriginalImage(), suavizada2, Scalar(255, 0, 0), 0.6))
+    ui->label->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(procesado->getOriginalImage(), segmentacionHuesos, Scalar(255, 0, 0), 0.6))
                         .scaled(ui->label->width(), ui->label->height(), 
                                Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
-    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(procesado->getOriginalImage(), pulmones, Scalar(0, 155, 0), 0.6))
+    ui->label_2->setPixmap(QPixmap::fromImage(matToQImage(procesado->createColorOverlay(procesado->getOriginalImage(), segementacionPulmones, Scalar(0, 155, 0), 0.6))
                           .scaled(ui->label_2->width(), ui->label_2->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
@@ -301,7 +291,8 @@ void MainWindow::updateFilters()
                                  
 }
 
-// ==================== BOTÓN 2: Pipeline Completo ====================
+
+
 void MainWindow::on_pushButton_2_clicked()
 {
     if(currentImage.empty()) {
@@ -374,14 +365,14 @@ void MainWindow::on_pushButton_2_clicked()
     stages.push_back({"Imagen sin la camilla", imgSinCamilla});
 
 
-    Mat imgCLAHE = processor->applyCLAHE(imgSinCamilla,3);
+    Mat imgCLAHE = procesado->applyCLAHE(imgSinCamilla,3);
     stages.push_back({"Ecualizacion del Histograma", imgSinCamilla});
 
-    Mat imgHuesosSegmentada =  processor->segmentByIntensity(imgCLAHE, a_h, 255);
+    Mat imgHuesosSegmentada =  procesado->segmentByIntensity(imgCLAHE, a_h, 255);
     stages.push_back({"Ecualizacion del Histograma", imgHuesosSegmentada});
 
-    Mat imgMejSuavizadaHuesos = processor->filterNLMeans(imgHuesosSegmentada);
-    Mat segmentoHuesos = processor->filterMedian(imgMejSuavizadaHuesos, b_h);
+    Mat imgMejSuavizadaHuesos = procesado->filterNLMeans(imgHuesosSegmentada);
+    Mat segmentoHuesos = procesado->filterMedian(imgMejSuavizadaHuesos, b_h);
 
     stages.push_back({"Resultado de huesos", segmentoHuesos});
 
@@ -417,10 +408,10 @@ void MainWindow::on_pushButton_2_clicked()
     
     bitwise_and(maskMusculosSinHuesos, maskGrasaInv, maskMusculosSinHuesos);
 
-    Mat maskDeteccionMusculos = processor->morphOpening(maskMusculosSinHuesos, 3);
+    Mat maskDeteccionMusculos = procesado->morphOpening(maskMusculosSinHuesos, 3);
     
     // Closing para rellenar huecos internos
-    maskDeteccionMusculos = processor->morphClosing(maskDeteccionMusculos, 5);
+    maskDeteccionMusculos = procesado->morphClosing(maskDeteccionMusculos, 5);
 
     stages.push_back({"Mascara limpia ", maskDeteccionMusculos});
     // PASO 9: Refinamiento de bordes

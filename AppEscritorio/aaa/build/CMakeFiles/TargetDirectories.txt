@@ -1,3 +1,0 @@
-/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/CMakeFiles/main.dir
-/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/CMakeFiles/edit_cache.dir
-/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/CMakeFiles/rebuild_cache.dir

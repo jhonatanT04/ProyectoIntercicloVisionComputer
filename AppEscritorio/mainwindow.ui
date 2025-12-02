@@ -733,7 +733,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider2">
                                                     <property name="text">
-                                                        <string>Tamaño Kernel Mediana</string>
+                                                        <string>Tamaño Kernel Gaussian</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -756,7 +756,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider3">
                                                     <property name="text">
-                                                        <string>Nivel de Denoising</string>
+                                                        <string>Nivel de Mediana</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,

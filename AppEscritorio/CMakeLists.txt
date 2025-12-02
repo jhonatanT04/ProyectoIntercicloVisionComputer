@@ -27,7 +27,7 @@ set(SOURCES
     mainwindow.ui
     pipelinedialog.cpp  
     pipelinedialog.h
-    ProcesadoIMGc/CTProcessorSimple.cpp
+    # ProcesadoIMGc/CTProcessorSimple.cpp
     aaa/ImageProcessor.cpp
 )
 
