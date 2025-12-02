@@ -4,6 +4,8 @@
 #include <QTimer>
 #include <fstream>
 #include <unistd.h>
+#include <QDateTime>
+#include <QMutexLocker>
 
 MainWindow::MainWindow(QWidget *parent)
     : QMainWindow(parent)
@@ -12,6 +14,14 @@ MainWindow::MainWindow(QWidget *parent)
     ui->setupUi(this);
     processor = new CTImageProcessor("output");  
     procesado = new ImageProcessor();
+
+    // Preparar carpeta output y ruta del CSV (no abrimos el archivo todavía)
+    QDir outDir("output");
+    if (!outDir.exists()) outDir.mkpath(".");
+    csvFilePath = outDir.filePath("ram_log.csv");
+
+    // Iniciar muestreo de RAM cada 1 segundo y flush periódico (1s)
+    startRamSampling(1000); // 1000 ms = 1 s
 
     QTimer *ramTimer = new QTimer(this);
     connect(ramTimer, &QTimer::timeout, this, [this]() {
@@ -68,6 +78,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::updateFilters);
     connect(ui->checkBox_dncnn_suavizado, &QCheckBox::stateChanged,
         this, &MainWindow::updateImageByCheckbox);
+
+    // Nota: ya iniciamos startRamSampling arriba
 
 }
 
@@ -608,7 +620,6 @@ void MainWindow::updateImageByCheckbox()
     }
 }
 
-
 void MainWindow::showImage(const cv::Mat &img)
 {
     if (img.empty()) return;
@@ -625,7 +636,16 @@ void MainWindow::showImage(const cv::Mat &img)
     );
 }
 
-
+void MainWindow::logDataToCSV(const QString &filename)
+{
+    // Escrbir una línea inmediata con Timestamp,RAM_MB
+    std::ofstream file(filename.toStdString(), std::ios::app);
+    if (!file.is_open()) return;
+    double ramMB = getCurrentRAMUsageMB();
+    file << QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz").toStdString()
+         << "," << ramMB << "\n";
+    file.close();
+}
 double MainWindow::getCurrentRAMUsageMB()
 {
     std::ifstream statm("/proc/self/statm");
@@ -639,6 +659,88 @@ double MainWindow::getCurrentRAMUsageMB()
 
     double ramMB = (resident * page_size_kb) / 1024.0;
     return ramMB;
+}
+
+
+void MainWindow::closeEvent(QCloseEvent *event)
+{
+    // Detener muestreo y volcar buffer al disco
+    stopRamSampling();
+    flushBufferToFile();
+
+    // Cerrar archivo si está abierto
+    if (csvFile.is_open()) {
+        csvFile.close();
+        qDebug() << "CSV cerrado:" << csvFilePath;
+    }
+
+    QMainWindow::closeEvent(event);
+}
+
+// Inicia el muestreo de RAM en intervalos de intervalMs (por defecto 1 ms)
+void MainWindow::startRamSampling(int intervalMs)
+{
+    if (ramSampleTimer) return; // ya iniciado
+
+    ramSampleTimer = new QTimer(this);
+    connect(ramSampleTimer, &QTimer::timeout, this, [this]() {
+        double ramMB = getCurrentRAMUsageMB();
+        QString line = QDateTime::currentDateTime().toString("yyyy-MM-dd hh:mm:ss.zzz")
+                       + "," + QString::number(ramMB, 'f', 3);
+        {
+            QMutexLocker locker(&bufferMutex);
+            ramBuffer.append(line);
+            // Mantener solo las últimas 100 filas
+            while (ramBuffer.size() > 100) {
+                ramBuffer.removeFirst();
+            }
+        }
+    });
+    ramSampleTimer->start(intervalMs);
+
+    // Timer para flush periódico al disco (cada 1000 ms)
+    csvFlushTimer = new QTimer(this);
+    connect(csvFlushTimer, &QTimer::timeout, this, [this]() {
+        flushBufferToFile();
+    });
+    csvFlushTimer->start(1000);
+}
+
+void MainWindow::stopRamSampling()
+{
+    if (ramSampleTimer) {
+        ramSampleTimer->stop();
+        ramSampleTimer->deleteLater();
+        ramSampleTimer = nullptr;
+    }
+    if (csvFlushTimer) {
+        csvFlushTimer->stop();
+        csvFlushTimer->deleteLater();
+        csvFlushTimer = nullptr;
+    }
+}
+
+void MainWindow::flushBufferToFile()
+{
+    // Sobrescribir el CSV con la cabecera y las últimas N=100 filas en memoria
+    QStringList localCopy;
+    {
+        QMutexLocker locker(&bufferMutex);
+        if (ramBuffer.isEmpty()) return;
+        localCopy = ramBuffer;
+        // no limpiar aquí; mantenemos el buffer como historial en memoria
+    }
+
+    std::ofstream out(csvFilePath.toStdString(), std::ios::trunc);
+    if (!out.is_open()) {
+        qDebug() << "No se pudo abrir para escribir:" << csvFilePath;
+        return;
+    }
+    out << "Timestamp,RAM_MB\n";
+    for (const QString &ln : localCopy) {
+        out << ln.toStdString() << "\n";
+    }
+    out.close();
 }
 
 
