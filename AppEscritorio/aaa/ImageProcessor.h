@@ -54,18 +54,25 @@ public:
     
     Mat highlightRegion(String name, Mat mask,  Mat background,Scalar color);
     
-    
+    Mat createMultiMaskOverlay(const Mat& original, 
+                                           const Mat& mask1, 
+                                           const Mat& mask2,
+                                           const Scalar& color1, 
+                                           const Scalar& color2, 
+                                           double alpha);
     
 
     Mat eliminarCamilla(Mat img);
     Mat createMultiColorOverlay(const Mat& imgOriginal, 
-                                            const Mat& mask1, 
-                                            const Mat& mask2, 
-                                            const Mat& mask3,
-                                            const Scalar& color1,
-                                            const Scalar& color2,
-                                            const Scalar& color3,
-                                            double alpha);
+                            const Mat& mask1, 
+                            const Mat& mask2, 
+                            const Mat& mask3,
+                            const Mat& mask4,
+                            const Scalar& color1,
+                            const Scalar& color2,
+                            const Scalar& color3,
+                            const Scalar& color4,
+                            double alpha);
 
 
    

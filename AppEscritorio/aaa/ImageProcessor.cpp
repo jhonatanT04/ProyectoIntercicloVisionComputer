@@ -308,6 +308,31 @@ Mat ImageProcessor::createColorOverlay( Mat original,  Mat mask,
     return output;
 }
 
+Mat ImageProcessor::createMultiMaskOverlay(const Mat& original, 
+                                           const Mat& mask1, 
+                                           const Mat& mask2,
+                                           const Scalar& color1, 
+                                           const Scalar& color2, 
+                                           double alpha) {
+    Mat output, bgr;
+    if (original.channels() == 1) 
+        cvtColor(original, bgr, COLOR_GRAY2BGR);
+    else 
+        bgr = original.clone();
+    
+    Mat overlay = bgr.clone();
+    
+    // Aplicar primera máscara con su color
+    overlay.setTo(color1, mask1);
+    
+    // Aplicar segunda máscara con su color
+    overlay.setTo(color2, mask2);
+    
+    // Mezclar con la imagen original
+    addWeighted(bgr, 1 - alpha, overlay, alpha, 0, output);
+    return output;
+}
+
 Mat ImageProcessor::createHeatmap( Mat input) {
     Mat output, gray;
     if (input.channels() > 1) cvtColor(input, gray, COLOR_BGR2GRAY);
@@ -367,12 +392,13 @@ Mat ImageProcessor::createMultiColorOverlay(const Mat& imgOriginal,
                                             const Mat& mask1, 
                                             const Mat& mask2, 
                                             const Mat& mask3,
+                                            const Mat& mask4,
                                             const Scalar& color1,
                                             const Scalar& color2,
                                             const Scalar& color3,
+                                            const Scalar& color4,
                                             double alpha)
 {
-    
     if (imgOriginal.empty()) {
         return Mat();
     }
@@ -385,25 +411,32 @@ Mat ImageProcessor::createMultiColorOverlay(const Mat& imgOriginal,
         resultado = imgOriginal.clone();
     }
     
-    // Aplicar primera máscara (por ejemplo: huesos en azul)
+    // Aplicar primera máscara (huesos)
     if (!mask1.empty()) {
         Mat overlay1 = resultado.clone();
         overlay1.setTo(color1, mask1);
         addWeighted(resultado, 1.0 - alpha, overlay1, alpha, 0, resultado);
     }
     
-    // Aplicar segunda máscara (por ejemplo: pulmones en amarillo)
+    // Aplicar segunda máscara (pulmones)
     if (!mask2.empty()) {
         Mat overlay2 = resultado.clone();
         overlay2.setTo(color2, mask2);
         addWeighted(resultado, 1.0 - alpha, overlay2, alpha, 0, resultado);
     }
     
-    // Aplicar tercera máscara (por ejemplo: músculos en verde)
+    // Aplicar tercera máscara (músculos)
     if (!mask3.empty()) {
         Mat overlay3 = resultado.clone();
         overlay3.setTo(color3, mask3);
         addWeighted(resultado, 1.0 - alpha, overlay3, alpha, 0, resultado);
+    }
+    
+    // Aplicar cuarta máscara (grasa)
+    if (!mask4.empty()) {
+        Mat overlay4 = resultado.clone();
+        overlay4.setTo(color4, mask4);
+        addWeighted(resultado, 1.0 - alpha, overlay4, alpha, 0, resultado);
     }
     
     return resultado;

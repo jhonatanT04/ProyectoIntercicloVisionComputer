@@ -46,8 +46,10 @@ MainWindow::MainWindow(QWidget *parent)
     ui->horizontalSlider_4->setValue(70);
 
     ui->horizontalSlider_5->setRange(1, 255);   
-    ui->horizontalSlider_5->setValue(200);
+    ui->horizontalSlider_5->setValue(150);
 
+    ui->horizontalSlider_6->setRange(2,255);
+    ui->horizontalSlider_6->setValue(200);
 
 
     ui->horizontalSlider_7->setRange(30, 100);   
@@ -69,6 +71,8 @@ MainWindow::MainWindow(QWidget *parent)
     connect(ui->horizontalSlider_4, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
     connect(ui->horizontalSlider_5, &QSlider::valueChanged,
+            this, &MainWindow::updateFilters);
+    connect(ui->horizontalSlider_6, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
     
     connect(ui->horizontalSlider_7, &QSlider::valueChanged,
@@ -121,7 +125,7 @@ void MainWindow::on_pushButton_clicked()
            this, "Seleccionar imagen CT", "",
            "Imagenes (*.png *.jpg *.jpeg *.bmp *.IMA *.dcm)");
 
-    //QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
+    // QString fileName = "/home/jhonatan/VisualCodeStudio/ProyectoIntercicloVisionComputer/AppEscritorio/aaa/build/L19.IMA";
     
     if(fileName.isEmpty()) return;
 
@@ -177,7 +181,7 @@ void MainWindow::updateFilters()
     
     int a_m = ui->horizontalSlider_4->value();
     int b_m = ui->horizontalSlider_5->value();
-    
+    int c_m = ui->horizontalSlider_6->value();
 
 
     int a_p = ui->horizontalSlider_7->value();
@@ -188,6 +192,8 @@ void MainWindow::updateFilters()
     // PROCESAMIENTO
     // ============================================================
 
+
+    //Segmentacion de Huesos  170-200
     Mat img = procesado->getOriginalImage();
 
     Mat imgSuavizada = procesado->filterMedian(img, k_n);
@@ -206,66 +212,116 @@ void MainWindow::updateFilters()
     Mat imgMejSuavizada = procesado->filterNLMeans(imgMejoramiento);
     Mat segmentacionHuesos = procesado->filterMedian(imgMejSuavizada, b_h);
     
-    //segmentacionHuesos = processor->morphDilation(segmentacionHuesos, k_n);
-
+    
+    //Segmentacion de grasa  200-155
     std::vector<Mat> capasPulmones = procesado->deteccionPulmones(procesado->eliminarCamilla(img), a_p,b_p,c_p);
     Mat segementacionPulmones = capasPulmones[2];
 
-    
-    Mat imgCLAHEmus = procesado->applyCLAHE(procesado->eliminarCamilla(img), 3.0);
-    Mat imgBlur;
-    GaussianBlur(imgCLAHEmus, imgBlur, Size(5, 5), 0);
-    Mat maskCuerpo = imgBlur;
+
+    //Segmentacion de grasa  70-100
+    Mat imgCLAHEgras = procesado->applyCLAHE(procesado->eliminarCamilla(img), 3.0);
+    Mat imgBlurGras ;
+    GaussianBlur(imgCLAHEgras, imgBlurGras, Size(5, 5), 0);
+    Mat maskCuerpo = imgBlurGras;
     
     // PASO 4: Segmentación por intensidad de músculos
     // Los músculos tienen intensidad media (50-120 aproximadamente)
-    Mat maskMusculos;
-    inRange(imgBlur, Scalar(a_m), Scalar(b_m), maskMusculos);
+    Mat maskGrasa;
+    inRange(imgBlurGras, Scalar(a_m), Scalar(b_m), maskGrasa);
     
     // PASO 5: Aplicar máscara del cuerpo para eliminar exterior
-    Mat maskMusculosCuerpo;
-    bitwise_and(maskMusculos, maskCuerpo, maskMusculosCuerpo);
+    Mat maskGrasaCuerpo;
+    bitwise_and(maskGrasa, maskCuerpo, maskGrasaCuerpo);
     
     // PASO 6: Eliminar estructuras óseas (alta intensidad)
     // Mat maskHuesos = procesado->filterMedian(imgMejoramiento,k_n);
-    Mat maskHuesosInv;
-    bitwise_not(imgMejoramiento, maskHuesosInv);
+    Mat maskHuesosInvGras;
+    bitwise_not(imgMejoramiento, maskHuesosInvGras);
     
     // Quitar huesos de la máscara muscular
-    Mat maskMusculosSinHuesos;
-    bitwise_and(maskMusculosCuerpo, maskHuesosInv, maskMusculosSinHuesos);
+    Mat maskMusculosSinHuesosGras;
+    bitwise_and(maskGrasaCuerpo, maskHuesosInvGras, maskMusculosSinHuesosGras);
     
     // PASO 7: Eliminar grasa subcutánea (intensidad muy baja)
-    Mat maskGrasa;
-    inRange(imgBlur, Scalar(12), Scalar(12), maskGrasa);
-    Mat maskGrasaInv;
-    bitwise_not(maskGrasa, maskGrasaInv);
+    Mat maskGrasaGras;
+    inRange(imgBlurGras, Scalar(12), Scalar(12), maskGrasa);
+    Mat maskGrasaInvGras;
+    bitwise_not(maskGrasa, maskGrasaInvGras);
     
-    bitwise_and(maskMusculosSinHuesos, maskGrasaInv, maskMusculosSinHuesos);
+    bitwise_and(maskMusculosSinHuesosGras, maskGrasaInvGras, maskMusculosSinHuesosGras);
     
     // PASO 8: Limpieza morfológica
     // Opening para eliminar ruido pequeño
-    Mat segmentacionMusculos = procesado->morphOpening(maskMusculosSinHuesos, 3);
+    Mat segmentacionGrasa = procesado->morphOpening(maskMusculosSinHuesosGras, 3);
     
     // Closing para rellenar huecos internos
-    segmentacionMusculos = procesado->morphClosing(segmentacionMusculos, 5);
+    segmentacionGrasa = procesado->morphClosing(segmentacionGrasa, 5);
     
     // PASO 9: Refinamiento de bordes
-    Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
-    erode(segmentacionMusculos, segmentacionMusculos, kernel, Point(-1, -1), 1);
-    dilate(segmentacionMusculos, segmentacionMusculos, kernel, Point(-1, -1), 1);
+    Mat kernelGras = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+    erode(segmentacionGrasa, segmentacionGrasa, kernelGras, Point(-1, -1), 1);
+    dilate(segmentacionGrasa, segmentacionGrasa, kernelGras, Point(-1, -1), 1);
     
     // PASO 10: Crear visualización con color (opcional)
-    Mat resultado = procesado->createColorOverlay(procesado->getOriginalImage(), segmentacionMusculos, Scalar(0, 255, 255), 0.6);
+    Mat resultado = procesado->createColorOverlay(procesado->getOriginalImage(), segmentacionGrasa, Scalar(0, 255, 255), 0.6);
+
+
+    // Segmentacion de musculos  100-120
+    Mat imgCLAHEmus = procesado->applyCLAHE(procesado->eliminarCamilla(img), 3.0);
+    Mat imgBlurMus;
+    GaussianBlur(imgCLAHEmus, imgBlurMus, Size(5, 5), 0);
+    Mat maskCuerpoMus = imgBlurMus;
+    
+    Mat maskMusculos;
+    inRange(imgBlurMus, Scalar(b_m), Scalar(c_m), maskMusculos);
+    
+    Mat maskMusculosCuerpo;
+    bitwise_and(maskMusculos, maskCuerpoMus, maskMusculosCuerpo);
+    
+    Mat maskHuesosInvMus;
+    bitwise_not(imgMejoramiento, maskHuesosInvMus);
+    
+    Mat maskMusculosSinHuesosMus;
+    bitwise_and(maskMusculosCuerpo, maskHuesosInvMus, maskMusculosSinHuesosMus);
+    
+    Mat maskGrasaMus;
+    inRange(imgBlurMus, Scalar(12), Scalar(12), maskGrasaMus);
+    Mat maskGrasaInvMus;
+    bitwise_not(maskGrasaMus, maskGrasaInvMus);
+    
+    bitwise_and(maskMusculosSinHuesosMus, maskGrasaInvMus, maskMusculosSinHuesosMus);
+    
+    Mat segmentacionMusculos = procesado->morphOpening(maskMusculosSinHuesosMus, 3);
+    
+    segmentacionMusculos = procesado->morphClosing(segmentacionMusculos, 5);
+    
+    Mat kernelMus = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
+    erode(segmentacionMusculos, segmentacionMusculos, kernelMus, Point(-1, -1), 1);
+    dilate(segmentacionMusculos, segmentacionMusculos, kernelMus, Point(-1, -1), 1);
+    
+    
+    Mat resultadoGrasaMusculos = procesado->createMultiMaskOverlay(
+        procesado->getOriginalImage(),
+        segmentacionGrasa,        // Primera máscara
+        segmentacionMusculos,     // Segunda máscara
+        Scalar(0, 255, 255),      // Color amarillo para grasa
+        Scalar(0, 0, 255),        // Color rojo para músculos
+        0.6
+    );
+
+
+
     
     Mat resultadoMultiColor = procesado->createMultiColorOverlay(
-        procesado->getOriginalImage(),   
+        procesado->getOriginalImage(), 
         segmentacionHuesos,              
         segementacionPulmones,           
-        segmentacionMusculos,                      
+        segmentacionMusculos,            
+        segmentacionGrasa,               
         Scalar(255, 0, 0),               
-        Scalar(0, 155, 0),             
-        Scalar(0, 255, 255),               
+        Scalar(0, 155, 0),               
+        Scalar(0, 0, 255),               
+        Scalar(0, 255, 255),             
         0.6                              
     );
 
@@ -277,7 +333,7 @@ void MainWindow::updateFilters()
                           .scaled(ui->label_2->width(), ui->label_2->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
 
-    ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(resultado)
+    ui->label_3->setPixmap(QPixmap::fromImage(matToQImage(resultadoGrasaMusculos)
                           .scaled(ui->label_3->width(), ui->label_3->height(), 
                                  Qt::KeepAspectRatio, Qt::SmoothTransformation)));
     
