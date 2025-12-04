@@ -614,7 +614,7 @@
                                                 <item>
                                                     <widget class="QLabel" name="titleResult2">
                                                         <property name="text">
-                                                            <string>GRASA CORPORAL</string>
+                                                            <string>MUSULOS/GRASA CORPORAL</string>
                                                         </property>
                                                         <property name="styleSheet">
                                                             <string notr="true">color: #f093fb;
@@ -733,7 +733,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider2">
                                                     <property name="text">
-                                                        <string>Tamaño Kernel Gaussian</string>
+                                                        <string>Tamaño Kernel Media Para huesos</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -756,7 +756,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider3">
                                                     <property name="text">
-                                                        <string>Nivel de Mediana</string>
+                                                        <string>Tamaño de Kernel Mediana General</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -810,7 +810,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider5">
                                                     <property name="text">
-                                                        <string>Intensidad máxima</string>
+                                                        <string>Intensidad media</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,
@@ -833,7 +833,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider6">
                                                     <property name="text">
-                                                        <string>Humbral musculos</string>
+                                                        <string>Intensidad maxima</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255, 255, 0.8); font-size: 11px; font-weight: 600;</string>
@@ -927,7 +927,7 @@
                                             <item>
                                                 <widget class="QLabel" name="labelSlider9">
                                                     <property name="text">
-                                                        <string>Tamaño de Kernel</string>
+                                                        <string>Tamaño de Kernel para morfologia</string>
                                                     </property>
                                                     <property name="styleSheet">
                                                         <string notr="true">color: rgba(255, 255,

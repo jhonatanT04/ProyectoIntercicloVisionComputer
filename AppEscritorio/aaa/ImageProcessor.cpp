@@ -63,7 +63,7 @@ bool ImageProcessor::loadImage(const string& filePath) {
                 m_rawImage.at<short>(y, x) = it.Get();
             }
             
-            // Convertir a 8 bits para visualización
+            
             normalize(m_rawImage, m_originalImage, 0, 255, NORM_MINMAX, CV_8UC1);
             
             cout << "DICOM/IMA loaded: " << width << "x" << height << endl;
@@ -200,14 +200,14 @@ Mat ImageProcessor::applyXOR( Mat input1,  Mat input2) {
 
 // ============ FILTROS DE SUAVIZADO ============
 Mat ImageProcessor::filterGaussian( Mat input, int ksize) {
-    if (ksize % 2 == 0) ksize++;  // Asegurar impar
+    if (ksize % 2 == 0) ksize++;
     Mat output;
     GaussianBlur(input, output, cv::Size(ksize, ksize), 0);
     return output;
 }
 
 Mat ImageProcessor::filterMedian( Mat input, int ksize) {
-    if (ksize % 2 == 0) ksize++;  // Asegurar impar
+    if (ksize % 2 == 0) ksize++;
     Mat output;
     medianBlur(input, output, ksize);
     return output;
@@ -264,32 +264,23 @@ std::vector<Mat> ImageProcessor::deteccionPulmones(Mat img,int a, int b,int tama
         return Mat();
     }
 
-    // 2. Umbralización (Thresholding)
-    // Convertimos lo oscuro (aire) en blanco (255) y el tejido en negro (0)
+    
     Mat binary;
     threshold(img, binary, a, b, THRESH_BINARY_INV);
     capas.push_back(binary);
-    // 3. Eliminar el aire exterior (Fondo)
-    // Copiamos la imagen binaria para crear la máscara
     Mat mask = binary.clone();
 
-    // Aplicamos FloodFill desde la esquina (0,0).
-    // Rellenamos con negro (0) todo el blanco conectado al borde.
-    // En C++, floodFill modifica la imagen 'mask' directamente.
     floodFill(mask, cv::Point(0, 0), Scalar(0));
 
-    // 4. Operaciones Morfológicas (Mejora de la máscara)
-    // Creamos un elemento estructurante de 3x3 (rectángulo)
     Mat kernel = getStructuringElement(MORPH_RECT, cv::Size(tamanio, tamanio));
     
-    // Aplicamos "Closing" para rellenar huecos internos (vasos sanguíneos)
-    // Iterations = 2 para asegurar un buen relleno
+    
     morphologyEx(mask, mask, MORPH_CLOSE, kernel, cv::Point(-1, -1), 2);
     
     capas.push_back(mask);
-    // 5. Aplicar la máscara a la imagen original
+    
     Mat resultado;
-    // bitwise_and toma (src1, src2, destination, mask)
+    
     bitwise_and(img, img, resultado, mask);
     capas.push_back(resultado);
 
@@ -322,13 +313,10 @@ Mat ImageProcessor::createMultiMaskOverlay(const Mat& original,
     
     Mat overlay = bgr.clone();
     
-    // Aplicar primera máscara con su color
     overlay.setTo(color1, mask1);
     
-    // Aplicar segunda máscara con su color
     overlay.setTo(color2, mask2);
     
-    // Mezclar con la imagen original
     addWeighted(bgr, 1 - alpha, overlay, alpha, 0, output);
     return output;
 }
@@ -374,7 +362,6 @@ Mat ImageProcessor::highlightRegion(String name,Mat mask,  Mat background, Scala
         Rect boundRect = boundingRect(contours[i]);
         double area = contourArea(contours[i]);
         
-        // Filtrar contornos muy pequeños
         if (area > 100) {
             rectangle(output, boundRect, Scalar(0, 255, 0), 2);
             
@@ -403,7 +390,6 @@ Mat ImageProcessor::createMultiColorOverlay(const Mat& imgOriginal,
         return Mat();
     }
     
-    // Convertir imagen original a BGR si es escala de grises
     Mat resultado;
     if (imgOriginal.channels() == 1) {
         cvtColor(imgOriginal, resultado, COLOR_GRAY2BGR);
@@ -411,28 +397,24 @@ Mat ImageProcessor::createMultiColorOverlay(const Mat& imgOriginal,
         resultado = imgOriginal.clone();
     }
     
-    // Aplicar primera máscara (huesos)
     if (!mask1.empty()) {
         Mat overlay1 = resultado.clone();
         overlay1.setTo(color1, mask1);
         addWeighted(resultado, 1.0 - alpha, overlay1, alpha, 0, resultado);
     }
     
-    // Aplicar segunda máscara (pulmones)
     if (!mask2.empty()) {
         Mat overlay2 = resultado.clone();
         overlay2.setTo(color2, mask2);
         addWeighted(resultado, 1.0 - alpha, overlay2, alpha, 0, resultado);
     }
     
-    // Aplicar tercera máscara (músculos)
     if (!mask3.empty()) {
         Mat overlay3 = resultado.clone();
         overlay3.setTo(color3, mask3);
         addWeighted(resultado, 1.0 - alpha, overlay3, alpha, 0, resultado);
     }
     
-    // Aplicar cuarta máscara (grasa)
     if (!mask4.empty()) {
         Mat overlay4 = resultado.clone();
         overlay4.setTo(color4, mask4);

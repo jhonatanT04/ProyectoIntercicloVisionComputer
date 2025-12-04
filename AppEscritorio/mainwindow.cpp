@@ -58,8 +58,8 @@ MainWindow::MainWindow(QWidget *parent)
     ui->horizontalSlider_8->setRange(200, 255);   
     ui->horizontalSlider_8->setValue(200);
 
-    ui->horizontalSlider_9->setRange(0, 10);    
-    ui->horizontalSlider_9->setValue(5);
+    // ui->horizontalSlider_9->setRange(0, 10);    
+    // ui->horizontalSlider_9->setValue(5);
     
     
     connect(ui->horizontalSlider, &QSlider::valueChanged,
@@ -79,8 +79,8 @@ MainWindow::MainWindow(QWidget *parent)
             this, &MainWindow::updateFilters);
     connect(ui->horizontalSlider_8, &QSlider::valueChanged,
             this, &MainWindow::updateFilters);
-    connect(ui->horizontalSlider_9, &QSlider::valueChanged,
-            this, &MainWindow::updateFilters);
+    // connect(ui->horizontalSlider_9, &QSlider::valueChanged,
+    //         this, &MainWindow::updateFilters);
     connect(ui->checkBox_dncnn_suavizado, &QCheckBox::stateChanged,
         this, &MainWindow::updateImageByCheckbox);
 
@@ -224,25 +224,23 @@ void MainWindow::updateFilters()
     GaussianBlur(imgCLAHEgras, imgBlurGras, Size(5, 5), 0);
     Mat maskCuerpo = imgBlurGras;
     
-    // PASO 4: Segmentación por intensidad de músculos
-    // Los músculos tienen intensidad media (50-120 aproximadamente)
+    
     Mat maskGrasa;
     inRange(imgBlurGras, Scalar(a_m), Scalar(b_m), maskGrasa);
     
-    // PASO 5: Aplicar máscara del cuerpo para eliminar exterior
+    
     Mat maskGrasaCuerpo;
     bitwise_and(maskGrasa, maskCuerpo, maskGrasaCuerpo);
     
-    // PASO 6: Eliminar estructuras óseas (alta intensidad)
-    // Mat maskHuesos = procesado->filterMedian(imgMejoramiento,k_n);
+    
     Mat maskHuesosInvGras;
     bitwise_not(imgMejoramiento, maskHuesosInvGras);
     
-    // Quitar huesos de la máscara muscular
+    
     Mat maskMusculosSinHuesosGras;
     bitwise_and(maskGrasaCuerpo, maskHuesosInvGras, maskMusculosSinHuesosGras);
     
-    // PASO 7: Eliminar grasa subcutánea (intensidad muy baja)
+    
     Mat maskGrasaGras;
     inRange(imgBlurGras, Scalar(12), Scalar(12), maskGrasa);
     Mat maskGrasaInvGras;
@@ -250,23 +248,22 @@ void MainWindow::updateFilters()
     
     bitwise_and(maskMusculosSinHuesosGras, maskGrasaInvGras, maskMusculosSinHuesosGras);
     
-    // PASO 8: Limpieza morfológica
-    // Opening para eliminar ruido pequeño
+    
     Mat segmentacionGrasa = procesado->morphOpening(maskMusculosSinHuesosGras, 3);
     
-    // Closing para rellenar huecos internos
+    
     segmentacionGrasa = procesado->morphClosing(segmentacionGrasa, 5);
     
-    // PASO 9: Refinamiento de bordes
+    
     Mat kernelGras = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
     erode(segmentacionGrasa, segmentacionGrasa, kernelGras, Point(-1, -1), 1);
     dilate(segmentacionGrasa, segmentacionGrasa, kernelGras, Point(-1, -1), 1);
     
-    // PASO 10: Crear visualización con color (opcional)
+    
     Mat resultado = procesado->createColorOverlay(procesado->getOriginalImage(), segmentacionGrasa, Scalar(0, 255, 255), 0.6);
 
 
-    // Segmentacion de musculos  100-120
+    
     Mat imgCLAHEmus = procesado->applyCLAHE(procesado->eliminarCamilla(img), 3.0);
     Mat imgBlurMus;
     GaussianBlur(imgCLAHEmus, imgBlurMus, Size(5, 5), 0);
@@ -304,8 +301,8 @@ void MainWindow::updateFilters()
         procesado->getOriginalImage(),
         segmentacionGrasa,        // Primera máscara
         segmentacionMusculos,     // Segunda máscara
-        Scalar(0, 255, 255),      // Color amarillo para grasa
-        Scalar(0, 0, 255),        // Color rojo para músculos
+        Scalar(0, 255, 255),      // Color para grasa
+        Scalar(0, 0, 255),        // Color para músculos
         0.6
     );
 
@@ -466,11 +463,11 @@ void MainWindow::on_pushButton_2_clicked()
 
     Mat maskDeteccionMusculos = procesado->morphOpening(maskMusculosSinHuesos, 3);
     
-    // Closing para rellenar huecos internos
+    
     maskDeteccionMusculos = procesado->morphClosing(maskDeteccionMusculos, 5);
 
     stages.push_back({"Mascara limpia ", maskDeteccionMusculos});
-    // PASO 9: Refinamiento de bordes
+    
 
     Mat kernel = getStructuringElement(MORPH_ELLIPSE, Size(3, 3));
     erode(maskDeteccionMusculos, maskDeteccionMusculos, kernel, Point(-1, -1), 1);
@@ -708,11 +705,11 @@ double MainWindow::getCurrentRAMUsageMB()
 
 void MainWindow::closeEvent(QCloseEvent *event)
 {
-    // Detener muestreo y volcar buffer al disco
+    
     stopRamSampling();
     flushBufferToFile();
 
-    // Cerrar archivo si está abierto
+    
     if (csvFile.is_open()) {
         csvFile.close();
         qDebug() << "CSV cerrado:" << csvFilePath;
@@ -721,7 +718,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
     QMainWindow::closeEvent(event);
 }
 
-// Inicia el muestreo de RAM en intervalos de intervalMs (por defecto 1 ms)
+
 void MainWindow::startRamSampling(int intervalMs)
 {
     if (ramSampleTimer) return; // ya iniciado
@@ -734,7 +731,7 @@ void MainWindow::startRamSampling(int intervalMs)
         {
             QMutexLocker locker(&bufferMutex);
             ramBuffer.append(line);
-            // Mantener solo las últimas 100 filas
+            
             while (ramBuffer.size() > 100) {
                 ramBuffer.removeFirst();
             }
@@ -742,7 +739,7 @@ void MainWindow::startRamSampling(int intervalMs)
     });
     ramSampleTimer->start(intervalMs);
 
-    // Timer para flush periódico al disco (cada 1000 ms)
+
     csvFlushTimer = new QTimer(this);
     connect(csvFlushTimer, &QTimer::timeout, this, [this]() {
         flushBufferToFile();
