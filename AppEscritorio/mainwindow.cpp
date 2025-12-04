@@ -20,8 +20,7 @@ MainWindow::MainWindow(QWidget *parent)
     if (!outDir.exists()) outDir.mkpath(".");
     csvFilePath = outDir.filePath("ram_log.csv");
 
-    // Iniciar muestreo de RAM cada 1 segundo y flush periódico (1s)
-    startRamSampling(1000); // 1000 ms = 1 s
+    startRamSampling(1000); 
 
     QTimer *ramTimer = new QTimer(this);
     connect(ramTimer, &QTimer::timeout, this, [this]() {
@@ -721,7 +720,7 @@ void MainWindow::closeEvent(QCloseEvent *event)
 
 void MainWindow::startRamSampling(int intervalMs)
 {
-    if (ramSampleTimer) return; // ya iniciado
+    if (ramSampleTimer) return; 
 
     ramSampleTimer = new QTimer(this);
     connect(ramSampleTimer, &QTimer::timeout, this, [this]() {
