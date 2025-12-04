@@ -11,16 +11,13 @@ class DnCNN(nn.Module):
         super(DnCNN, self).__init__()
         
         layers = []
-        # Primera capa: Conv + ReLU
         layers.append(nn.Conv2d(channels, num_features, kernel_size=3, padding=1, bias=True))
         layers.append(nn.ReLU(inplace=True))
         
-        # Capas intermedias: Conv + ReLU (sin BatchNorm)
         for _ in range(num_layers - 2):
             layers.append(nn.Conv2d(num_features, num_features, kernel_size=3, padding=1, bias=True))
             layers.append(nn.ReLU(inplace=True))
         
-        # Última capa: Solo Conv
         layers.append(nn.Conv2d(num_features, channels, kernel_size=3, padding=1, bias=True))
         
         self.dncnn = nn.Sequential(*layers)
@@ -29,7 +26,6 @@ class DnCNN(nn.Module):
         noise = self.dncnn(x)
         return x - noise  
 
-# ==================== FUNCIONES DE UTILIDAD ====================
 def cargar_imagen_ct(ruta_imagen):
     try:
         import pydicom
@@ -63,14 +59,11 @@ def posprocesar_resultado(tensor_salida, forma_original):
     img_salida = np.clip(img_salida, 0, 1)  
     return img_salida
 
-# ==================== FUNCIÓN PRINCIPAL ====================
 def reducir_ruido_ct(ruta_imagen, mostrar_resultados=True):
     
-    # 1. Cargar imagen
     img_original = cargar_imagen_ct(ruta_imagen)
     print(f"Dimensiones de la imagen: {img_original.shape}")
     
-    # 2. Crear y cargar modelo
     print("Inicializando modelo DnCNN...")
     device = torch.device('cuda' if torch.cuda.is_available() else 'cpu')
     print(f"Dispositivo: {device}")
@@ -92,25 +85,21 @@ def reducir_ruido_ct(ruta_imagen, mostrar_resultados=True):
                 new_state_dict[k] = v
         
         modelo.load_state_dict(new_state_dict)
-        print("✓ Modelo pre-entrenado cargado exitosamente!")
+        print("Modelo pre-entrenado cargado exitosamente!")
     else:
         print("ADVERTENCIA: No se encontraron pesos pre-entrenados")
     modelo.eval()
     
-    # 3. Preprocesar
     img_tensor = preprocesar_para_modelo(img_original)
     img_tensor = img_tensor.to(device)
     
-    # 4. Inferencia
     print("Procesando imagen...")
     with torch.no_grad():
         img_denoised = modelo(img_tensor)
     
-    # 5. Posprocesar
     img_limpia = posprocesar_resultado(img_denoised, img_original.shape)
     img_original_norm = normalizar_imagen(img_original)
     
-    # 6. Visualizar resultados
     if mostrar_resultados:
         fig, axes = plt.subplots(1, 3, figsize=(15, 5))
         
@@ -144,25 +133,21 @@ if __name__ == "__main__":
         ruta_imagen = "imgAnalizar/ApicePulmonar/L143_QD_1_1.CT.0004.0053.2015.12.22.20.45.11.504991.358762830.IMA"
         print(f" Usando ruta por defecto: {ruta_imagen}")
     
-    # Verificar que la ruta existe
     if not os.path.exists(ruta_imagen):
         print(f"Error: No se encontró la imagen en '{ruta_imagen}'")
         sys.exit(1)
     
     try:
-        # Procesar imagen
         img_limpia, img_original = reducir_ruido_ct(ruta_imagen, mostrar_resultados=False)
         
-        # Guardar resultado para Qt
         output_dir = "output"
         os.makedirs(output_dir, exist_ok=True)
         
-        # Convertir a 0-255 y guardar
         img_salida = (img_limpia * 255).astype(np.uint8)
         output_path = os.path.join(output_dir, "resultado_denoising.png")
         cv2.imwrite(output_path, img_salida)
         
-        print(f"\n✓ Procesamiento completado exitosamente!")
+        print(f"\n Procesamiento completado exitosamente!")
         print(f"  - Imagen original: {img_original.shape}")
         print(f"  - Imagen procesada: {img_limpia.shape}")
         print(f"  - Guardada en: {output_path}")
